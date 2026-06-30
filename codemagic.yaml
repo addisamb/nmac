@@ -82,9 +82,13 @@ workflows:
         script: |
           export PATH="$PATH":"$HOME/.maestro/bin"
           mkdir -p maestro-artifacts
-          maestro test .maestro \
-            --format junit --output maestro-artifacts/report.xml \
-            --debug-output maestro-artifacts
+          cd maestro-artifacts
+          # Run from inside the artifacts dir so takeScreenshot PNGs (written relative
+          # to the working dir) and debug output land here and get uploaded.
+          maestro test ../.maestro \
+            --format junit --output report.xml \
+            --debug-output .
+          echo "=== screenshots produced ==="; ls -la *.png || true
     artifacts:
       - maestro-artifacts/**          # screenshots, video, logs, JUnit report
       - ios/build/Build/Products/**/*.app
