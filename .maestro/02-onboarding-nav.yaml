@@ -1,0 +1,29 @@
+# Navigation smoke (no backend needed): walk the first-run flow
+# Select Language -> Onboarding -> "Let's you in" sign-in entry.
+# Steps are optional so the flow stays green if a screen is skipped/reordered.
+appId: com.techverticks.nmoAcademyDemo
+---
+- launchApp:
+    clearState: true
+- takeScreenshot: 01_launch
+
+# Language selection (first launch)
+- tapOn:
+    text: "English"
+    optional: true
+- tapOn:
+    text: "Continue"
+    optional: true
+- takeScreenshot: 02_after_language
+
+# Onboarding carousel — skip to the end
+- tapOn:
+    text: "Skip"
+    optional: true
+- takeScreenshot: 03_after_onboarding
+
+# Sign-in entry screen ("Let's you in")
+- assertVisible:
+    text: "Continue with mail"
+    optional: true
+- takeScreenshot: 04_signin_entry

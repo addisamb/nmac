@@ -1,0 +1,76 @@
+# Codemagic CI — iOS Simulator E2E (NO Apple account / NO code signing required).
+#
+# Builds NMOAcademy for the iOS Simulator in Release (so the JS bundle is embedded
+# and no Metro server is needed), boots a simulator, installs the app, and runs
+# Maestro UI flows. Artifacts returned: screenshots, video, and a JUnit report.
+#
+# Setup (one-time): codemagic.io → add this repo (or upload a zip) → run "ios-simulator-e2e".
+# No certificates, provisioning profiles, or Apple Developer account needed for this workflow.
+
+workflows:
+  ios-simulator-e2e:
+    name: iOS Simulator E2E (Maestro)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      vars:
+        SIM_DEVICE: "iPhone 16"          # any installed simulator; adjust if Codemagic image differs
+        BUNDLE_ID: "com.techverticks.nmoAcademyDemo"
+      node: 20                            # RN 0.81 requires Node >= 20.19
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install JS dependencies
+        script: npm install --legacy-peer-deps
+
+      - name: Install CocoaPods
+        script: cd ios && pod install
+
+      - name: Build for iOS Simulator (Release, unsigned)
+        script: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace ios/NMOAcademy.xcworkspace \
+            -scheme NMOAcademy \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath ios/build \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Boot simulator
+        script: |
+          # Try the named device; fall back to the first available iPhone in the image.
+          if ! xcrun simctl boot "$SIM_DEVICE" 2>/dev/null; then
+            UDID=$(xcrun simctl list devices available | grep -oE '\(([0-9A-F-]{36})\)' | tr -d '()' | head -1)
+            echo "Falling back to first available simulator: $UDID"
+            xcrun simctl boot "$UDID" || true
+          fi
+          xcrun simctl bootstatus booted -b || true
+
+      - name: Install app on simulator
+        script: |
+          set -euo pipefail
+          APP_PATH=$(find ios/build/Build/Products -name "NMOAcademy.app" -type d | head -1)
+          echo "Installing: $APP_PATH"
+          xcrun simctl install booted "$APP_PATH"
+
+      - name: Install Maestro
+        script: curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Run Maestro flows
+        script: |
+          export PATH="$PATH":"$HOME/.maestro/bin"
+          mkdir -p maestro-artifacts
+          maestro test .maestro \
+            --format junit --output maestro-artifacts/report.xml \
+            --debug-output maestro-artifacts
+    artifacts:
+      - maestro-artifacts/**          # screenshots, video, logs, JUnit report
+      - ios/build/Build/Products/**/*.app
+    # Optional: email the report to yourself
+    # publishing:
+    #   email:
+    #     recipients:
+    #       - you@example.com

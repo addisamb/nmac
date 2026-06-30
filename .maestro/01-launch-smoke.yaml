@@ -1,0 +1,14 @@
+# Smoke test: the app launches in the simulator and renders its first screen
+# without crashing. This is the first thing to get green — it proves the
+# Release simulator build + JS bundle actually run end-to-end.
+appId: com.techverticks.nmoAcademyDemo
+---
+- launchApp:
+    clearState: true
+- takeScreenshot: 01_launch
+- waitForAnimationToEnd:
+    timeout: 10000
+- takeScreenshot: 02_first_screen
+# The first screen is the Auth/Onboarding stack. We capture screenshots rather than
+# asserting specific text because the UI strings are i18n-driven; the login-flow test
+# (02-login.yaml) is finalized once these screenshots reveal the rendered English text.
