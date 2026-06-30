@@ -23,8 +23,13 @@ workflows:
       - name: Install JS dependencies
         script: npm install --legacy-peer-deps
 
-      - name: Install CocoaPods
-        script: cd ios && pod install
+      - name: Install CocoaPods dependencies (via Bundler — RN pins CocoaPods 1.15.2)
+        script: |
+          set -euo pipefail
+          # The app's Gemfile pins cocoapods 1.15.2; Podfile.lock was built with it.
+          # Install that exact version and run pod install through bundler.
+          bundle install
+          cd ios && bundle exec pod install
 
       - name: Build for iOS Simulator (Release, unsigned)
         script: |
