@@ -38,6 +38,9 @@ workflows:
       - name: Build for iOS Simulator (Release, unsigned)
         script: |
           set -euo pipefail
+          # Build arm64-only for the Apple-Silicon (M2) simulator. The default
+          # universal build also compiles an x86_64 slice, where `fmt` fails to
+          # compile; we only run on the M2's arm64 simulator, so exclude x86_64.
           xcodebuild \
             -workspace ios/NMOAcademy.xcworkspace \
             -scheme NMOAcademy \
@@ -45,6 +48,9 @@ workflows:
             -sdk iphonesimulator \
             -derivedDataPath ios/build \
             -destination 'generic/platform=iOS Simulator' \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=YES \
+            EXCLUDED_ARCHS=x86_64 \
             CODE_SIGNING_ALLOWED=NO \
             build
 
