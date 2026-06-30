@@ -2,7 +2,7 @@
 
 // export const BASE_URL = 'https://api.nmoacademy.com/'; //live
 
-export const BASE_URL = 'http://192.168.100.83:3100/'; //local
+export const BASE_URL = 'https://heath-orientation-evening-virtual.trycloudflare.com/'; //QA tunnel -> local Docker backend
 
 export const PAYTABS_BASE_URL = 'https://secure.paytabs.sa/payment/request';
 export const PAYTABS_AUTHERIZATION_KEY = 'SNJNGDLDHD-J6BHNMWBBW-RD99LNG22Z';

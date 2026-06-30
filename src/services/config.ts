@@ -1,5 +1,5 @@
 
-export const BASE_URL: string = "http://192.168.100.39:3100/";
+export const BASE_URL: string = "https://heath-orientation-evening-virtual.trycloudflare.com/"; // QA tunnel -> local Docker backend
 export const BASE_PATH: string = "api/v1/";
 
 // export const SOCKET_URL: string ='http://192.168.100.39:3100/';
