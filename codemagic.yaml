@@ -26,10 +26,14 @@ workflows:
       - name: Install CocoaPods dependencies (via Bundler — RN pins CocoaPods 1.15.2)
         script: |
           set -euo pipefail
-          # The app's Gemfile pins cocoapods 1.15.2; Podfile.lock was built with it.
-          # Install that exact version and run pod install through bundler.
+          # The app's Gemfile pins cocoapods 1.15.2; use it via bundler.
           bundle install
-          cd ios && bundle exec pod install
+          cd ios
+          # The committed Podfile.lock is stale vs the installed JS deps (e.g. it pins
+          # Firebase/Auth 12.2.0 but @react-native-firebase/auth needs 12.10.0).
+          # Remove it so CocoaPods resolves a fresh, consistent set against node_modules.
+          rm -f Podfile.lock
+          bundle exec pod install --repo-update
 
       - name: Build for iOS Simulator (Release, unsigned)
         script: |
