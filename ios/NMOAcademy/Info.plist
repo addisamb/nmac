@@ -44,10 +44,16 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<key>NSCameraUsageDescription</key>
+	<string>NMO Academy needs access to your camera so you can take photos for your profile and course activities.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>NMO Academy needs access to your microphone for audio and video features within lessons.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>NMO Academy uses speech recognition to support voice-based learning features.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>NMO needs to the camera permission</string>
+	<string>NMO Academy needs access to your photo library so you can upload a profile picture and course materials.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>NMO Academy uses your location to personalize content relevant to your region.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIBackgroundModes</key>
