@@ -1,5 +1,8 @@
 
-export const BASE_URL: string = "https://heath-orientation-evening-virtual.trycloudflare.com/"; // QA tunnel -> local Docker backend
+// Single source of truth for the API host lives in src/APICall/constants.js.
+// Re-exported here so there is exactly one place to change per environment.
+import { BASE_URL as API_BASE_URL } from "../APICall/constants";
+export const BASE_URL: string = API_BASE_URL;
 export const BASE_PATH: string = "api/v1/";
 
 // export const SOCKET_URL: string ='http://192.168.100.39:3100/';

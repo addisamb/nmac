@@ -1,8 +1,7 @@
-// export const BASE_URL = "http://51.112.28.13:3100/";  //live
-
-// export const BASE_URL = 'https://api.nmoacademy.com/'; //live
-
-export const BASE_URL = 'https://heath-orientation-evening-virtual.trycloudflare.com/'; //QA tunnel -> local Docker backend
+// ── API host — single source of truth for the whole app ──────────────
+// For a production/release build, switch BASE_URL to the production URL:
+//   export const BASE_URL = 'https://api.nmoacademy.com/'; // PRODUCTION
+export const BASE_URL = 'https://heath-orientation-evening-virtual.trycloudflare.com/'; // QA (temporary tunnel)
 
 export const PAYTABS_BASE_URL = 'https://secure.paytabs.sa/payment/request';
 export const PAYTABS_AUTHERIZATION_KEY = 'SNJNGDLDHD-J6BHNMWBBW-RD99LNG22Z';
@@ -13,8 +12,6 @@ export const GUEST_USER_PAYLOAD = {
   email: 'guestuser@gmail.com',
   password: '12345678',
 };
-
-// export const BASE_URL = "https://9404-119-73-96-78.ngrok-free.app/";
 
 export const BASE_PATH = 'api/v1/';
 export const API_TIMEOUT = 500000;
