@@ -1,0 +1,36 @@
+# Guest login + browse (needs the app pointed at a reachable backend).
+# Walks: onboarding -> sign-in -> guest login -> home -> open a course.
+# Steps are optional so the flow captures screenshots even if a screen differs.
+appId: com.techverticks.nmoAcademyDemo
+---
+- launchApp:
+    clearState: true
+- takeScreenshot: 01_launch
+- tapOn:
+    text: "English"
+    optional: true
+- tapOn:
+    text: "Continue"
+    optional: true
+- tapOn:
+    text: "Skip"
+    optional: true
+- takeScreenshot: 02_signin_entry
+- tapOn:
+    text: "Continue with mail"
+    optional: true
+- takeScreenshot: 03_signin_screen
+# Guest login (uses the built-in guest account)
+- tapOn:
+    text: "Guest"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 8000
+- takeScreenshot: 04_home
+# Open the seeded course
+- tapOn:
+    text: "Budgeting & Saving"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 6000
+- takeScreenshot: 05_course_detail
