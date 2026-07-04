@@ -1,7 +1,7 @@
 // ── API host — single source of truth for the whole app ──────────────
 // For a production/release build, switch BASE_URL to the production URL:
 //   export const BASE_URL = 'https://api.nmoacademy.com/'; // PRODUCTION
-export const BASE_URL = 'https://c8fed237726dfc.lhr.life/'; // QA tunnel (localhost.run) // QA (temporary tunnel)
+export const BASE_URL = 'https://2fc54b1142bdb0.lhr.life/'; // QA tunnel (stable localhost.run key)
 
 export const PAYTABS_BASE_URL = 'https://secure.paytabs.sa/payment/request';
 export const PAYTABS_AUTHERIZATION_KEY = 'SNJNGDLDHD-J6BHNMWBBW-RD99LNG22Z';
