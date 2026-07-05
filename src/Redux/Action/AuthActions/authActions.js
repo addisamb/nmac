@@ -47,6 +47,12 @@ export const LoginApi = (data, navigation) => {
       })
       .catch(error => {
         dispatch({ type: ActionType.AUTH_LOADER, payload: false });
+        Utills.showToast(
+          error?.response?.data?.message ||
+            'Unable to reach the server. Please check your connection.',
+          '',
+          'error',
+        );
         return false;
       });
   };

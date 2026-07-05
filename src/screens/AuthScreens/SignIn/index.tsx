@@ -84,9 +84,9 @@ export const SignIn: React.FC<SignInNowProps> = ({}) => {
       if (res?.accessToken?.length > 10) {
         dispatch({type: ActionType.TOKEN, payload: res?.accessToken});
         dispatch(isLogin('homescreen'));
-      } else {
-        Utills.showToast('User not exist', '', 'error');
       }
+      // On failure, LoginApi already shows the real reason
+      // (wrong credentials from the server, or a connection error).
     }
   }
 

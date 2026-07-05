@@ -51,8 +51,8 @@ const ResetPasswordSchema = Yup.object().shape({
   // ),
   confirmPassword: Yup.string()
     .min(8, t('password_must_be_at_least_8_characters'))
+    .oneOf([Yup.ref('password')], 'Passwords must match')
     .required(t('please_enter_your_password')),
-  // .oneOf([Yup.ref('password')], 'Please enter same password.'),
 });
 
 const verifyMobileSchema = Yup.object().shape({
@@ -84,10 +84,10 @@ const ChangePasswordSchema = Yup.object().shape({
   //     /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
   //     'Please enter a valid password that contains at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character (e.g., Password@123).',
   //   ),
-  // confirmPassword: Yup.string()
-  //   .min(8, 'Confirm Password must be atleast 8 characters long.')
-  //   .required('Please enter your confirm password.')
-  //   .oneOf([Yup.ref('password')], 'Please enter same password.'),
+  confirmPassword: Yup.string()
+    .min(8, t('password_must_be_at_least_8_characters'))
+    .oneOf([Yup.ref('password')], 'Passwords must match')
+    .required(t('please_enter_your_password')),
 });
 
 export default {
