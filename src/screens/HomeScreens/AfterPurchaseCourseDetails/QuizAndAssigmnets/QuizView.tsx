@@ -168,12 +168,13 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
   async function fetcData(id) {
     const response = await dispatch(GetQuizAnswer(id));
-    console.log('API Response:', response.responseData);
-    const answersArray = response.responseData[0].answers;
+    console.log('API Response:', response?.responseData);
+    // Guard against an empty/failed response (previously crashed on responseData[0]).
+    const answersArray = response?.responseData?.[0]?.answers;
 
     // Log the 'answers' array
     console.log('Answers Array:', answersArray);
-    if (answersArray.length > 0) {
+    if (answersArray?.length > 0) {
       answersArray.forEach((innerArray: any, outerIndex: any) => {
         if (innerArray.length > 0 && typeof innerArray[0] === 'object') {
           innerArray.forEach((object: any, innerIndex: any) => {

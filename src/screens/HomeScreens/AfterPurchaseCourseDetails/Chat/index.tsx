@@ -256,6 +256,7 @@ export const CommentAndReply: React.FC<{
   const userData = useSelector(
     (state: RootState) => state?.HomeReducer?.userData,
   );
+  const uploadAuthToken = useSelector((state: any) => state?.AuthReducer?.userToken);
   const dispatch = useDispatch();
 
   const [modalPostVisible, setModalPostVisible] = useState(false);
@@ -706,7 +707,10 @@ export const Chat: React.FC<ChatProps> = (route) => {
           method: 'post',
           url: url,
           data: formData,
-          headers: {'Content-Type': 'multipart/form-data'},
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${uploadAuthToken}`,
+          },
         });
 
         setreply({

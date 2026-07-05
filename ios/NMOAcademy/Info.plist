@@ -22,6 +22,9 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- Standard HTTPS only — declare export compliance so App Store doesn't prompt each submission. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 
 	<!-- ✅ Add this section -->
 	<key>CFBundleURLTypes</key>

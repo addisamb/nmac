@@ -47,6 +47,7 @@ import {BASE_URL} from '../../../APICall/constants';
 
 export const EditProfile: React.FC<EditProfileProps> = ({token}) => {
   const userData = useSelector(state => state?.HomeReducer?.userData);
+  const uploadAuthToken = useSelector((state: any) => state?.AuthReducer?.userToken);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -145,7 +146,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({token}) => {
       const res = await axios.post(`${url}media/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          // Add any other headers you might need, e.g., authorization token
+          Authorization: `Bearer ${uploadAuthToken}`,
         },
       });
 

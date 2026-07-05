@@ -36,6 +36,7 @@ import utills from '../../../config/utills';
 
 export const TransactionsDetails: React.FC<TransactionsDetailsProps> = ({}) => {
   const userData = useSelector(state => state?.HomeReducer?.userData);
+  const uploadAuthToken = useSelector((state: any) => state?.AuthReducer?.userToken);
   // console.log('userData==>', userData?.email);
 
   const route = useRoute();
@@ -123,6 +124,7 @@ export const TransactionsDetails: React.FC<TransactionsDetailsProps> = ({}) => {
           const res = await axios.post(`${url}media/upload`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${uploadAuthToken}`,
             },
           });
 

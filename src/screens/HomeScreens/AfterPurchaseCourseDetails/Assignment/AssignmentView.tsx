@@ -63,6 +63,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadedFile_ID, setUploadedFile_ID] = useState('');
   const userData = useSelector((state: RootState) => state?.HomeReducer?.userData);
+  const uploadAuthToken = useSelector((state: any) => state?.AuthReducer?.userToken);
   const course = useSelector(state => state?.HomeReducer?.course_Object);
 
   // console.log('++++++++', showBtnAndUploadOption);
@@ -255,7 +256,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
         const res = await axios.post(`${url}media/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-            // Add any other headers you might need, e.g., authorization token
+            Authorization: `Bearer ${uploadAuthToken}`,
           },
         });
 
