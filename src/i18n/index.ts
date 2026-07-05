@@ -456,7 +456,7 @@ export const resources = {
       replies: 'Replies',
       change_password: 'Change password',
       enter_mobile_number: 'Enter Mobile Number',
-      referral_code: 'Referral Code',
+      referral_code: 'Referral Code (Optional)',
       reward: 'Reward',
       points_remaining: 'Remainning Points',
       replace: 'Replace',
@@ -959,7 +959,7 @@ export const resources = {
       send_verification_code: 'إرسال رمز التحقق',
       skip_now: 'تخطى',
       enter_mobile_number: 'ادخل رقم الجوال',
-      referral_code: 'كود الإحالة',
+      referral_code: 'كود الإحالة (اختياري)',
       seconds: 'ثواني',
       enter_otp_code: 'أدخل رمز OTP',
       otp_text:

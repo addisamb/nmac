@@ -117,12 +117,16 @@ export const SocialLoginApi = (data, navigation) => {
     // dispatch({ type: ActionType.AUTH_LOADER, payload: true });
     return api('auth/user/social', data, 'post')
       .then(response => {
-        MessageHandler('SocialLoginApi', response?.data);
+        MessageHandler(response?.data);
         // dispatch({type: ActionType.AUTH_LOADER, payload: false});
         return response?.data;
       })
       .catch(error => {
-        Utills.showToast(error, '', 'success');
+        Utills.showToast(
+          error?.response?.data?.message || 'Social login failed. Please try again.',
+          '',
+          'error',
+        );
         // dispatch({type: ActionType.AUTH_LOADER, payload: false});
         return false;
       })
@@ -137,7 +141,7 @@ export const VerifyOtp = data => {
     dispatch({ type: ActionType.AUTH_LOADER, payload: true });
     return api('auth/verifyAccount', data, 'patch')
       .then(response => {
-        MessageHandler('VerifyOtp', response?.data);
+        MessageHandler(response?.data);
         return response?.data;
       })
       .catch(error => {
@@ -155,7 +159,7 @@ export const VerifyPhone = (data, navigation) => {
     dispatch({ type: ActionType.AUTH_LOADER, payload: true });
     return api('auth/user/phone', data, 'post')
       .then(response => {
-        MessageHandler('VerifyPhone', response?.data);
+        MessageHandler(response?.data);
         return response?.data;
       })
       .catch(error => {
@@ -172,7 +176,7 @@ export const SignAfterVerfyOtp = (data, navigation) => {
     dispatch({ type: ActionType.AUTH_LOADER, payload: true });
     return api('auth/user/phone', data, 'post')
       .then(response => {
-        MessageHandler('SignAfterVerfyOtp', response?.data);
+        MessageHandler(response?.data);
         return response?.data;
       })
       .catch(error => {
@@ -336,7 +340,7 @@ export const VerifyForgotPasswordOtp = data => {
     dispatch({ type: ActionType.AUTH_LOADER, payload: true });
     return api('user/verifyOTP', data, 'post')
       .then(response => {
-        MessageHandler('VerifyForgotPasswordOtp', response?.data);
+        MessageHandler(response?.data);
         return response?.data;
       })
       .catch(error => {
@@ -431,7 +435,7 @@ export const DrawRequest = data => {
     return api('notifications/withDrawalNotification', data, 'post', dispatch)
       .then(response => {
         dispatch({ type: ActionType.HOME_LOADER, payload: false });
-        MessageHandler('DrawRequest', response?.data);
+        MessageHandler(response?.data);
         return response?.data;
       })
       .catch(error => {
