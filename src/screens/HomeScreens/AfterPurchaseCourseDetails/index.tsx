@@ -407,7 +407,7 @@ export const AfterPurchaseCourseDetails: React.FC<
             color: '#ffffff',
             paddingHorizontal: Metrix.HorizontalSize(20),
             marginTop: -5,
-            textAlign: I18nManager.forceRTL ? 'left' : 'right',
+            textAlign: I18nManager.isRTL ? 'left' : 'right',
           }}>
           {courseDetail?.name}
         </CustomText.LargeSemiBoldText>

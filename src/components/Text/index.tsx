@@ -50,7 +50,7 @@ const LargeBoldText = ({
       style={[
         styles.LargeBoldText,
         {
-          // textAlign: I18nManager.forceRTL ? "left" : "right",
+          // textAlign: I18nManager.isRTL ? "left" : "right",
           color: isSecondaryColor
             ? Utills.selectedThemeColors().SecondaryTextColor
             : Utills.selectedThemeColors().PrimaryTextColor,
@@ -196,37 +196,37 @@ const styles = StyleSheet.create({
   ExtraLargeBoldText: {
     fontFamily: Fonts['Bold'],
     fontSize: FontType.FontExtraLarge,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   LargeBoldText: {
-    // textAlign: I18nManager.forceRTL ? "left" : "right",
+    // textAlign: I18nManager.isRTL ? "left" : "right",
     fontFamily: Fonts['Bold'],
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
     fontSize: FontType.FontLarge,
   },
   LargeSemiBoldText: {
     fontFamily: Fonts['Semi-Bold'],
     fontSize: FontType.FontLarge,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   MediumText: {
     fontFamily: Fonts['Medium'],
     fontSize: FontType.FontMedium,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   RegularText: {
     fontFamily: Fonts['Regular'],
     fontSize: FontType.FontRegular,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   SmallText: {
     fontFamily: Fonts['Regular'],
     fontSize: FontType.FontSmall,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   ExtraSmallText: {
     fontFamily: Fonts['Regular'],
     fontSize: FontType.FontExtraSmall,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
 });

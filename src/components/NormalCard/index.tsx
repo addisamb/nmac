@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     // borderWidth:1,
     width: '70%',
     fontSize: FontType.FontRegular,
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   container: {
     // flex: 1,

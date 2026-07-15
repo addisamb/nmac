@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   customTextStyle: {
     // color:"red",
     fontFamily: Fonts['Medium'],
-    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    textAlign: I18nManager.isRTL ? 'left' : 'right',
   },
   touchableOpacityCustomStyle: {
     // borderWidth:1,

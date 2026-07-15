@@ -69,7 +69,7 @@ export const CustomInput: FC<CustomInputProps> = ({
       {heading && (
         <CustomText.RegularText
           customStyle={{
-            textAlign: I18nManager.forceRTL ? 'left' : 'right',
+            textAlign: I18nManager.isRTL ? 'left' : 'right',
             marginLeft: Metrix.HorizontalSize(10),
             fontSize: Metrix.customFontSize(15),
             ...customTextStyle,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts['Regular'],
     height: '100%',
     // borderWidth: 1,
-    // textAlign: I18nManager.forceRTL ? 'left' : 'right',
+    // textAlign: I18nManager.isRTL ? 'left' : 'right',
     textAlign: I18nManager.isRTL ? 'right' : 'left',
     // borderWidth: 1,
     // backgroundColor: Utills.selectedThemeColors().TextInputBaseColor,

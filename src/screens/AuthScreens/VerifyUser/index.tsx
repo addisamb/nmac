@@ -153,7 +153,7 @@ export const VerifyUser: React.FC<VerifyUserProps> = ({route}) => {
               />
               <CustomText.RegularText
                 customStyle={{
-                  textAlign: I18nManager.forceRTL ? 'left' : 'right',
+                  textAlign: I18nManager.isRTL ? 'left' : 'right',
                   marginBottom: Metrix.VerticalSize(10),
                   marginLeft: Metrix.HorizontalSize(10),
                   fontSize: Metrix.customFontSize(15),
@@ -224,7 +224,7 @@ export const VerifyUser: React.FC<VerifyUserProps> = ({route}) => {
                       color: 'red',
                       fontSize: normalizeFont(12),
                       fontWeight: '200', // Add this line for thin font
-                      textAlign: I18nManager.forceRTL ? 'left' : 'right',
+                      textAlign: I18nManager.isRTL ? 'left' : 'right',
                     }}
                     >
                     {errors.phone}

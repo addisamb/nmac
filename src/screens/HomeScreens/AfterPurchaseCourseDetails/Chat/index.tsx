@@ -426,7 +426,7 @@ export const CommentAndReply: React.FC<{
               width: '100%',
               justifyContent: 'space-between',
               marginLeft:
-                Platform.OS === 'ios' && I18nManager.forceRTL ? 25 : 0,
+                Platform.OS === 'ios' && I18nManager.isRTL ? 25 : 0,
             }}>
             <View
               style={[

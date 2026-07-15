@@ -104,7 +104,7 @@ export const RecoverPassword: React.FC<RecoverPasswordProps> = ({route}) => {
             {/* <View>
                 <CustomText.RegularText
                   customStyle={{
-                    textAlign: I18nManager.forceRTL ? 'left' : 'right',
+                    textAlign: I18nManager.isRTL ? 'left' : 'right',
                     marginBottom: Metrix.VerticalSize(10),
                     marginLeft: Metrix.HorizontalSize(10),
                     fontSize: Metrix.customFontSize(15),
