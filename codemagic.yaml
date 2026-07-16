@@ -127,7 +127,7 @@ workflows:
         XCODE_SCHEME: "NMOAcademy"
         APP_STORE_APP_ID: 6468957992                   # the live NMO Academy app record
       node: 20
-      xcode: 16.4
+      xcode: 26            # Apple requires the iOS 26 SDK (Xcode 26+) for App Store / TestFlight uploads
       cocoapods: default
     scripts:
       - name: Install JS dependencies
