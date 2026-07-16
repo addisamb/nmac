@@ -99,16 +99,20 @@ workflows:
     #       - you@example.com
 
   # ---------------------------------------------------------------------------
-  # Signed build -> TestFlight. AUTOMATIC code signing via the App Store Connect
-  # API key (no manual certs/profiles). Setup is done ENTIRELY on the
-  # "Environment variables" tab (app Settings -> Environment variables):
-  #   Add these 4 vars, each with group "appstore_credentials" and Secret ON:
-  #     APP_STORE_CONNECT_ISSUER_ID      = 0f30690d-bafc-495a-b3ad-4ecba6030087
-  #     APP_STORE_CONNECT_KEY_IDENTIFIER = 9DRG23SC42
-  #     APP_STORE_CONNECT_PRIVATE_KEY    = <contents of AuthKey_9DRG23SC42.p8>
-  #     CERTIFICATE_PRIVATE_KEY          = <contents of CERTIFICATE_PRIVATE_KEY.pem>
-  # Then run the "ios-testflight" workflow. The build installs on TestFlight and
-  # can be tested on any iPhone via a link (no Mac needed by the tester).
+  # Signed build -> TestFlight. AUTOMATIC signing via the App Store Connect API
+  # key, driven purely by ENVIRONMENT VARIABLES + the Codemagic CLI -- so it needs
+  # NO "Developer Portal" integration menu (that isn't available on this account).
+  #
+  # One-time UI setup, done under: Settings -> codemagic.yaml settings ->
+  # "Global variables and secrets"  (OR the app's "Environment variables" tab).
+  # Add these 4 variables, each in group "appstore_credentials", Secret = ON.
+  # (Values are NOT stored here -- they live only in Codemagic's encrypted vars.)
+  #   APP_STORE_CONNECT_ISSUER_ID      = <App Store Connect API key issuer id>
+  #   APP_STORE_CONNECT_KEY_IDENTIFIER = <App Store Connect API key id>
+  #   APP_STORE_CONNECT_PRIVATE_KEY    = <contents of the AuthKey_XXX.p8 file>
+  #   CERTIFICATE_PRIVATE_KEY          = <a PEM RSA private key for the cert>
+  # The `app-store-connect` and `keychain` CLI tools read these env vars directly.
+  # The build installs on TestFlight; testers use any iPhone via a link (no Mac).
   # ---------------------------------------------------------------------------
   ios-testflight:
     name: iOS TestFlight (signed)
@@ -142,7 +146,7 @@ workflows:
           set -euo pipefail
           keychain initialize
           # Fetch (or create) the distribution certificate + App Store provisioning
-          # profile for this bundle id, using the App Store Connect API key.
+          # profile for this bundle id, using the App Store Connect API key env vars.
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
