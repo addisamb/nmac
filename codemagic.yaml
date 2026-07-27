@@ -177,3 +177,32 @@ workflows:
         submit_to_testflight: true
         # beta_groups:            # optional: auto-add testers to a group
         #   - Internal Testers
+
+  # ---------------------------------------------------------------------------
+  # Android APK build. Produces an installable app-release.apk (signed with the
+  # committed debug.keystore per android/app/build.gradle, so it installs on any
+  # phone with no keystore setup). Codemagic's Linux image ships the Android SDK
+  # + NDK preinstalled, so the ~745MB NDK download that blocks local Windows
+  # builds is a non-issue here. Download the .apk from the build's Artifacts and
+  # sideload it onto any Android device (Settings > allow install from this app).
+  # No Play Store / signing-for-store needed for testing.
+  # ---------------------------------------------------------------------------
+  android-apk:
+    name: Android APK (release, debug-signed)
+    instance_type: linux_x2      # Linux has full Android tooling; if your plan lacks Linux, change to mac_mini_m2
+    max_build_duration: 60
+    environment:
+      node: 20
+      java: 21                   # matches the Gradle 8.14.3 / JDK 21 toolchain this project builds with
+    scripts:
+      - name: Install JS dependencies
+        script: npm install --legacy-peer-deps
+
+      - name: Build release APK
+        script: |
+          set -euo pipefail
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+    artifacts:
+      - android/app/build/outputs/**/*.apk
