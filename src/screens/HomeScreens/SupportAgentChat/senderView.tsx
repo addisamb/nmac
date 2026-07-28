@@ -76,8 +76,8 @@ const SenderView = ({data}) => {
             </View>
             :
             <TouchableOpacity onPress={()=>{ ShowContent(media) }} style={{ marginLeft: 10, backgroundColor: "#F6F6F6", borderRadius: 8, marginRight: 10, maxWidth: screenWidth -90, flexDirection: "row", alignItems: "center" }} >
-              <Image style={{ height: Metrix.VerticalSize(20), width: Metrix.HorizontalSize(20), left: 2, tintColor: "#000" }} source={getMediaIcon(media[0]?.path)} resizeMode="contain" />
-              <Text style={{ fontSize: 14, color: "#161719",  padding: 8, textDecorationLine: "underline" }} >{media[0]?.name}</Text>
+              <Image style={{ height: Metrix.VerticalSize(20), width: Metrix.HorizontalSize(20), left: 2, tintColor: "#000" }} source={getMediaIcon(media?.[0]?.path)} resizeMode="contain" />
+              <Text style={{ fontSize: 14, color: "#161719",  padding: 8, textDecorationLine: "underline" }} >{media?.[0]?.name}</Text>
             </TouchableOpacity>
         }
         </TouchableOpacity>

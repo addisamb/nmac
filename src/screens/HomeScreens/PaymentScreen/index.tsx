@@ -541,7 +541,7 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
             };
             let res = await dispatch(sendPayloadDataToBackend(payload));
 
-            if (res?.status && res.data.status == 'A') {
+            if (res?.status && res?.data?.status == 'A') {
               userEnrolledInToCourse();
               setLoading(false);
             } else {

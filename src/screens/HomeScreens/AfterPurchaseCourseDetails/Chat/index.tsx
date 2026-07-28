@@ -123,11 +123,11 @@ const CommentAndReplyContent: React.FC<CommentAndReplyContentTypes> = ({
     if (Platform.OS === 'android') {
       getDownloadPermissionAndroid().then(granted => {
         if (granted) {
-          downloadFileAndroid(data[0]?.path);
+          downloadFileAndroid(data?.[0]?.path);
         }
       });
     } else {
-      downloadFileIos(data[0]?.path).then(res => {
+      downloadFileIos(data?.[0]?.path).then(res => {
         RNFetchBlob.ios.previewDocument(res.path());
       });
     }
@@ -135,7 +135,7 @@ const CommentAndReplyContent: React.FC<CommentAndReplyContentTypes> = ({
 
 
   function PrevewDocumentWebView(data) {
-    let path = data[0]?.path
+    let path = data?.[0]?.path
 
     if (Platform.OS == 'android') {
       let FormatedUrl = HandleNavigationAndroid(path)
@@ -143,7 +143,7 @@ const CommentAndReplyContent: React.FC<CommentAndReplyContentTypes> = ({
         url: FormatedUrl,
         movetoCourseDetail: movetoCourseDetail,
         movetoIndex: 1,
-        documentTitle: data[0]?.name
+        documentTitle: data?.[0]?.name
       })
     }
     else if (Platform.OS == 'ios'){
@@ -152,7 +152,7 @@ const CommentAndReplyContent: React.FC<CommentAndReplyContentTypes> = ({
         url: FormatedUrl,
         movetoCourseDetail: movetoCourseDetail,
         movetoIndex: 1,
-        documentTitle: data[0]?.name
+        documentTitle: data?.[0]?.name
       })
     }
   }
@@ -193,7 +193,7 @@ const CommentAndReplyContent: React.FC<CommentAndReplyContentTypes> = ({
         <Linkify linkStyle={ { color: 'blue' } } linkDefault={ true }>
         <CustomText.SmallText>{message}</CustomText.SmallText>
         </Linkify>
-        {media.length ? (
+        {media?.length ? (
           <>
           <View
           style={{
@@ -439,7 +439,7 @@ export const CommentAndReply: React.FC<{
               <TouchableOpacity
                 // style={{ backgroundColor: "blue" }}
                 activeOpacity={0.7}>
-                {repliesData.length ? (
+                {repliesData?.length ? (
                 <TouchableOpacity
                 onPress={() => {
                   SaveUserId(commentarUserDetails);
@@ -482,7 +482,7 @@ export const CommentAndReply: React.FC<{
                   />
                 </TouchableOpacity>
                 )}
-                {repliesData.length ? (
+                {repliesData?.length ? (
                   <View style={styles.sideLineStyles} />
                 ) : null}
               </TouchableOpacity>

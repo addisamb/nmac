@@ -388,16 +388,16 @@ export const BonusMaterial: React.FC<BonusMaterialProps> = route => {
               image={
                 item?.type == 'webinar'
                   ? getMediaIcon(`${item?.type}.link`)
-                  : getMediaIcon(item?.media[0]?.path)
+                  : getMediaIcon(item?.media?.[0]?.path)
               }
               text={item.title}
               subtext={item.desc}
-              // greenText={getExtensionName(item?.media[0]?.path)}
+              // greenText={getExtensionName(item?.media?.[0]?.path)}
               greenText={`${
                 item?.type == 'webinar'
                   ? getExtensionName(`${item?.type}.link`)
-                  : getExtensionName(item?.media[0]?.path)
-              } ${formatDuration(item.media[0]?.meta?.duration)}`}
+                  : getExtensionName(item?.media?.[0]?.path)
+              } ${formatDuration(item?.media?.[0]?.meta?.duration)}`}
               customTextContainerStyle={{
                 width: '60%',
               }}
@@ -417,12 +417,12 @@ export const BonusMaterial: React.FC<BonusMaterialProps> = route => {
                   dataType:
                     item?.type == 'webinar'
                       ? getExtensionName(`${item?.type}.link`)
-                      : getExtensionName(item?.media[0]?.path),
+                      : getExtensionName(item?.media?.[0]?.path),
                   dataDetails: {
                     id: '1',
-                    title: item.media[0]?.meta?.mimetype,
-                    url: item?.media[0]?.path,
-                    duration: item.media[0]?.meta?.duration,
+                    title: item?.media?.[0]?.meta?.mimetype,
+                    url: item?.media?.[0]?.path,
+                    duration: item?.media?.[0]?.meta?.duration,
                   },
                 });
               }}

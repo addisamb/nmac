@@ -55,7 +55,7 @@ type CustomTabBarProps = {
 export const AfterPurchaseCourseDetails: React.FC<
   AfterPurchaseCourseDetailsProps
 > = ({route}) => {
-  const {movetoIndex, movetoCourseDetail} = route.params;
+  const {movetoIndex, movetoCourseDetail} = route.params || {};
 
   const navigation = useNavigation();
   const userData = useSelector(
@@ -307,7 +307,7 @@ export const AfterPurchaseCourseDetails: React.FC<
             <View
               style={{flexDirection: 'row', marginLeft: 5, marginVertical: 2}}>
               {courseDetail?.enrolledStudents
-                ?.splice(0, 4)
+                ?.slice(0, 4)
                 ?.map((item: object, index: number) => (
                   <Image
                     style={{
@@ -320,9 +320,9 @@ export const AfterPurchaseCourseDetails: React.FC<
                       borderWidth: 1,
                     }}
                     source={
-                      item?.enrolledStudentImage[0]?.profilePic == undefined
+                      item?.enrolledStudentImage?.[0]?.profilePic == undefined
                         ? Images.user2
-                        : {uri: item?.enrolledStudentImage[0]?.profilePic}
+                        : {uri: item?.enrolledStudentImage?.[0]?.profilePic}
                     }
                   />
                 ))}

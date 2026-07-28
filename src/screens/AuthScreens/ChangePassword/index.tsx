@@ -38,7 +38,7 @@ import {changePasswordApi} from '../../../Redux/Action/AuthActions/authActions';
 import {useNavigation} from '@react-navigation/native';
 
 export const ChangePassword: React.FC<ChangePasswordProps> = ({route}) => {
-  const {from, data} = route?.params;
+  const {from, data} = route?.params ?? {};
   const dispatch = useDispatch();
   const navigation = useNavigation();
   // to check onBoaring response

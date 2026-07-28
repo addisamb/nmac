@@ -61,7 +61,7 @@ export const TransactionsDetails: React.FC<TransactionsDetailsProps> = ({}) => {
     {
       id: '3',
       heading: t('payment_method'),
-      subheading: selectedItem?.description.includes('enrol') ? 'PayTabs' : t("points_program"),
+      subheading: selectedItem?.description?.includes('enrol') ? 'PayTabs' : t("points_program"),
     },
     {
       id: '4',
@@ -139,7 +139,7 @@ export const TransactionsDetails: React.FC<TransactionsDetailsProps> = ({}) => {
     }
   };
 
-  var date = new Date(selectedItem.createdAt);  
+  var date = selectedItem?.createdAt ? new Date(selectedItem.createdAt) : null;
 
   return (
     <>
@@ -155,7 +155,7 @@ export const TransactionsDetails: React.FC<TransactionsDetailsProps> = ({}) => {
             customStyle={{ marginHorizontal: Metrix.HorizontalSize(15) }}
             // items={transactionData}
             item1txt={t('date')}
-            item1value={`${date.toISOString().substring(0, 10)}`}
+            item1value={date && !isNaN(date.getTime()) ? date.toISOString().substring(0, 10) : ''}
             item2txt={t('status')}
             item2value={t('done')}
             bottomHeadingTitle={t('amount')}

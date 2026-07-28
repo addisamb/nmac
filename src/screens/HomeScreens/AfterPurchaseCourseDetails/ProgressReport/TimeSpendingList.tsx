@@ -238,7 +238,7 @@ const ConditionalDataComp: React.FC<{id: string, progress_Report: object}> = ({i
             details: {
               image: Images.PollSurveyIcon,
               primaryTitle: t('complete_quiz'),
-              primaryValue: progress_Report.quiz?.completedQuiz?.toString(),
+              primaryValue: progress_Report?.quiz?.completedQuiz?.toString(),
               secondaryTitle:  t('remaining'),
               secondaryValue: progress_Report?.quiz?.remainingQuiz?.toString(),
             },
@@ -285,9 +285,9 @@ const ConditionalDataComp: React.FC<{id: string, progress_Report: object}> = ({i
 
         default:
           setSpentHoursDetails({
-            details: data[0]?.details,
-            hoursSpent: data[0]?.hoursSpent,
-            coverImage: data[0]?.coverImage,
+            details: data?.[0]?.details,
+            hoursSpent: data?.[0]?.hoursSpent,
+            coverImage: data?.[0]?.coverImage,
           });
           break;
       }

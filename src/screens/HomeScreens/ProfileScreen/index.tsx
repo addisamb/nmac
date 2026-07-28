@@ -66,8 +66,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({}) => {
     userData?.type == 'guest'
       ? []
       : [
-          ...myCourseStatus?.enrolledCourse,
-          ...myCourseStatus?.completedCourses,
+          ...(myCourseStatus?.enrolledCourse ?? []),
+          ...(myCourseStatus?.completedCourses ?? []),
         ];
 
   const [modalVisible, setModalVisible] = useState(false);

@@ -196,7 +196,7 @@ export const QuizComp: React.FC<QuizCompProps> = ({
     const previous_node_id = index === 0 ? '0' : index.toString();
     const questionId = question?._id;
 
-    const options = question.options.map((option, optionIndex) => {
+    const options = (question?.options ?? []).map((option, optionIndex) => {
       return {
         id: (optionIndex + 1).toString(),
         option: option,
@@ -227,7 +227,7 @@ export const QuizComp: React.FC<QuizCompProps> = ({
       // },
       options,
     };
-  });
+  }) ?? [];
 
   // const [quizData, setQuizData] = useState(initialQuizData);
   const [currentQuizData, setCurrentQuizData] = useState<

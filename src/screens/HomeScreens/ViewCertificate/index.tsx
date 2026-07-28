@@ -13,7 +13,7 @@ import RNFetchBlob from 'react-native-blob-util'
 
 export const ViewCertificate: React.FC<ViewCertificateProps> = ({}) => {
   const route = useRoute();
-  const certificateData = route.params.certificatedata;
+  const certificateData = route.params?.certificatedata;
 
   const imageUrl = certificateData?.data?.image?.path;
   const pdfUrl =  certificateData?.data?.pdf?.path

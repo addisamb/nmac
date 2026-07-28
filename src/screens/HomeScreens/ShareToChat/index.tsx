@@ -35,11 +35,11 @@ const ShareToChat: React.FC<ShareToChatProps> = ({route, active}) => {
     selectedOne,
     wrongOne,
     selectedOption,
-  } = route.params;
+  } = route.params ?? {};
 
   console.log('====>> route', route.params);
 
-  const filteredOptions = options.filter(
+  const filteredOptions = (options ?? []).filter(
     option =>
       (option.isCorrect && !option.isWrong) ||
       (!option.isCorrect && option.isWrong),

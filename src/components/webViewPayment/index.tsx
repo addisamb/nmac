@@ -238,15 +238,21 @@ function goBack() {
           // Additional code if needed
         `}
         onMessage={(event) => {
-          const message = JSON.parse(event.nativeEvent.data);
+          let message;
+          try {
+            message = JSON.parse(event.nativeEvent.data);
+          } catch (e) {
+            // Payment page can post non-JSON messages; ignore them instead of crashing.
+            return;
+          }
 
           setLoading(true)
           console.log("response===>",message);
 
-          if(Array.isArray(message.data)){
+          if(Array.isArray(message?.data)){
             setLoading(false)
           }
-          if (message.data?.error == false) {
+          if (message?.data?.error == false) {
             setTimeout(() => {
               CheckPaymentIsSuccess()
             }, 4000);

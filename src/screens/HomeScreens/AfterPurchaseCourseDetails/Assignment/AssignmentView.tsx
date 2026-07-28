@@ -67,7 +67,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
   const course = useSelector(state => state?.HomeReducer?.course_Object);
 
   // console.log('++++++++', showBtnAndUploadOption);
-  console.log('++++++++', assignmentDetails.media[0]);
+  // console.log('++++++++', assignmentDetails?.media?.[0]);
 
   function renderItem(
     heading: string,
@@ -188,7 +188,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
               marginTop: Metrix.VerticalSize(10),
             }}>
             <CustomImage
-              source={getMediaIcon(assignmentDetails?.media[0]?.path)}
+              source={getMediaIcon(assignmentDetails?.media?.[0]?.path)}
               customStyle={{
                 width: Metrix.HorizontalSize(20),
                 height: Metrix.VerticalSize(20),
@@ -196,7 +196,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
               }}
             />
             <TouchableOpacity
-              onPress={()=>{ PrevewFile(assignmentDetails?.media[0]) }}
+              onPress={()=>{ PrevewFile(assignmentDetails?.media?.[0]) }}
             >
             <CustomText.RegularText
               isSecondaryColor
@@ -205,7 +205,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
                 color: "blue",
                 textDecorationLine: "underline"
               }}>
-              {assignmentDetails?.media[0].name}
+              {assignmentDetails?.media?.[0]?.name}
             </CustomText.RegularText>
             </TouchableOpacity>
           </View>
@@ -352,7 +352,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
           )}
           {renderItem(
             t('due_date'),
-            `${(assignmentDetails?.dueDate?.split('T')[0])}`,
+            `${(assignmentDetails?.dueDate?.split('T')?.[0] ?? '')}`,
             false,
           )}
         </View>

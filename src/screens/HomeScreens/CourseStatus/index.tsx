@@ -63,8 +63,8 @@ export const CourseStatusScreen: React.FC<CourseStatusScreenProps> = ({
     userData?.type == 'guest'
       ? []
       : [
-          ...myCourseStatus?.enrolledCourse,
-          ...myCourseStatus?.completedCourses,
+          ...(myCourseStatus?.enrolledCourse ?? []),
+          ...(myCourseStatus?.completedCourses ?? []),
         ];
 
 console.log("allCourses=====>>>", allCourses);
@@ -159,7 +159,7 @@ console.log("allCourses=====>>>", allCourses);
                   {item?.instructorName}
                 </CustomText.RegularText>
                 <CustomText.MediumText customStyle={styles.levelStyle}>
-                  {item?.courseDetails[0]?.category[0].name}
+                  {item?.courseDetails?.[0]?.category?.[0]?.name}
                 </CustomText.MediumText>
               </View>
               <View style={styles.progressBarViewStyle}>
