@@ -68,7 +68,7 @@ export const QuizAttemptsCards: React.FC<QuizAttemptsCardsProps> = ({
               color: Utills.selectedThemeColors().Primary,
               //   width: '80%',
             }}>
-            {`${score.toString()}/${totalQuestions}`}
+            {`${score ?? 0}/${totalQuestions ?? 0}`}
           </CustomText.LargeBoldText>
         </View>
       </View>

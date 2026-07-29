@@ -49,6 +49,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import utills from './src/config/utills';
 import {t} from 'i18next';
 import {SignupModal} from './src/components/SignupModal';
+import {ErrorBoundary} from './src/components/ErrorBoundary';
 import {PushNotification} from './src/containers';
 // import {getApp} from '@react-native-firebase/app';
 
@@ -259,7 +260,9 @@ function App(): JSX.Element {
               notification: Utills.selectedThemeColors().Base,
             },
           }}>
-          <MainStack />
+          <ErrorBoundary>
+            <MainStack />
+          </ErrorBoundary>
           <Toast config={toastConfig} />
           <Loader />
         </NavigationContainer>
