@@ -189,7 +189,7 @@ workflows:
   # ---------------------------------------------------------------------------
   android-apk:
     name: Android APK (release, debug-signed)
-    instance_type: linux_x2      # Linux has full Android tooling; if your plan lacks Linux, change to mac_mini_m2
+    instance_type: mac_mini_m2   # same instance the iOS builds use (known-good on the free macOS plan); has full Android tooling
     max_build_duration: 60
     environment:
       node: 20
