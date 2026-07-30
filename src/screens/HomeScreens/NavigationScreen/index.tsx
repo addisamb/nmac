@@ -159,7 +159,7 @@ const renderItem = ({item}) => (
         style={{
           marginTop: 5,
           // borderWidth:1,
-          textAlign: I18nManager.isRTL ? 'left' : 'right',
+          textAlign: I18nManager.isRTL ? 'right' : 'left',
         }}>
         {contentItem}
       </CustomText.RegularText>

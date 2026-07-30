@@ -35,9 +35,12 @@ type SignupModalProps = {
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').width;
-const dispatch = useDispatch();
 
 export const SignupModal: React.FC<SignupModalProps> = ({onPress}) => {
+  // useDispatch() is a hook — it MUST be called inside the component. It was at
+  // module scope, so `dispatch` was undefined and tapping the modal crashed with
+  // "undefined is not a function".
+  const dispatch = useDispatch();
   return (
     <TouchableOpacity activeOpacity={1} onPress={() =>{ dispatch(showLoginPleaseModal(false))}}  style={styles.container}>
       <TouchableWithoutFeedback>

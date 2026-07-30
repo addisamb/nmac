@@ -66,7 +66,7 @@ function App(): JSX.Element {
         text1Style={{
           fontSize: 14,
           fontWeight: '600',
-          textAlign: I18nManager.isRTL ? 'left' : 'right',
+          textAlign: I18nManager.isRTL ? 'right' : 'left',
         }}
         text2Style={{
           fontSize: 12,

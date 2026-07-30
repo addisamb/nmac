@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Colors, Metrix, Utills} from '../../config';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/reducers';
@@ -39,13 +40,21 @@ export const MainContainer: React.FC<MainContainerProps> = ({
   isFlatList,
 }) => {
   const darkMode = useSelector((state: RootState) => state?.home?.darkMode);
+  const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={20}>
-      <SafeAreaView style={[{flex: 1}, mainContainerStyle]}>
+      {/* RN's SafeAreaView handles insets on iOS only. On Android it's a no-op,
+          so bottom content/buttons got clipped by the gesture nav bar on some
+          devices. Add the bottom inset explicitly on Android (0 on iOS). */}
+      <SafeAreaView
+        style={[
+          {flex: 1, paddingBottom: Platform.OS === 'android' ? insets.bottom : 0},
+          mainContainerStyle,
+        ]}>
         <StatusBar
           hidden={hidden}
           barStyle={

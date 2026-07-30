@@ -216,7 +216,7 @@
 //                 labelStyle={{
 //                   fontSize: 14,
 //                   color: Utills.selectedThemeColors().PrimaryTextColor,
-//                   textAlign: I18nManager.isRTL ? 'left' : 'right',
+//                   textAlign: I18nManager.isRTL ? 'right' : 'left',
 //                 }}
 //                 onPress={option.onPress}
 //                 style={{width: '80%'}}
@@ -678,7 +678,7 @@ const DrawerContent: React.FC = () => {
                     style={{
                       fontSize: 14,
                       color: Utills.selectedThemeColors().PrimaryTextColor,
-                      textAlign: I18nManager.isRTL ? 'left' : 'right',
+                      textAlign: I18nManager.isRTL ? 'right' : 'left',
                     }}>
                     {option.label}
                   </CustomText.RegularText>
