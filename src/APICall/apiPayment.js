@@ -27,11 +27,24 @@ const apiPayment = async (path, params, method,dispatch) => {
       return response;
     })
     .catch(async (error) => {
-      
-      console.log("====ERROR=====",error.response.status);
+      console.log("====ERROR=====", error?.response?.status);
+
+      // No response (timeout/offline/CORS/server down): don't crash on
+      // error.response.status; return a shaped object for callers reading `.data`.
+      if (!error?.response) {
+        return {
+          data: {
+            status: false,
+            message: 'Unable to reach the server. Please check your connection.',
+          },
+        };
+      }
+
       if (error.response.status == 401) {
-        dispatch(showSessionExpireModal(true));
-        return
+        if (typeof dispatch === 'function') {
+          dispatch(showSessionExpireModal(true));
+        }
+        return error.response;
       }
 
       return error.response;
