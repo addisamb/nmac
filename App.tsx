@@ -227,18 +227,30 @@ function App(): JSX.Element {
   // })
 
   async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    if (enabled) {
-      const token = await messaging().getToken();
-      console.log('dEVICE TOKEN', token);
-      try {
-        await AsyncStorage.setItem('FCM_TOKEN', JSON.stringify(token));
-      } catch (error) {
-        console.error('Error storing value:', error);
+    try {
+      // messaging().requestPermission() is iOS-only — on Android it resolves
+      // AUTHORIZED without ever prompting. With targetSdk 33+ POST_NOTIFICATIONS
+      // needs a runtime grant, so Android users were silently never asked and
+      // never received notifications. notifee handles the Android 13+ prompt.
+      if (Platform.OS === 'android') {
+        await notifee.requestPermission();
       }
+
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      if (enabled) {
+        const token = await messaging().getToken();
+        try {
+          await AsyncStorage.setItem('FCM_TOKEN', JSON.stringify(token));
+        } catch (error) {
+          console.error('Error storing FCM token');
+        }
+      }
+    } catch (error) {
+      // Never let a permission/registration failure break app startup.
+      console.error('Notification permission/registration failed');
     }
   }
 

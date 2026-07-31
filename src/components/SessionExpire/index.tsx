@@ -35,9 +35,12 @@ type SessionExpireProps = {
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').width;
-const dispatch = useDispatch();
 
 export const SessionExpire: React.FC<SessionExpireProps> = ({onPress}) => {
+  // useDispatch() is a hook — it MUST be called inside the component. At module
+  // scope React's dispatcher is null, so `dispatch` was undefined and tapping the
+  // backdrop threw. (Same defect previously fixed in SignupModal.)
+  const dispatch = useDispatch();
   return (
     <TouchableOpacity activeOpacity={1} onPress={() =>{ dispatch(showSessionExpireModal(false))}}  style={styles.container}>
       <TouchableWithoutFeedback>

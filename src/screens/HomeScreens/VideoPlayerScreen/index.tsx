@@ -78,10 +78,13 @@ export const VideoPlayerScreen: React.FC<VideoPlayerScreenProps> = ({
   }
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-    };
+    // RN 0.81 removed BackHandler.removeEventListener — calling it threw on
+    // unmount (crashing the screen). addEventListener returns a subscription.
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackButtonClick,
+    );
+    return () => subscription.remove();
   }, []);
 
 

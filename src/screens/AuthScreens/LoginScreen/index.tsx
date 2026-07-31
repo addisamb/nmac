@@ -161,9 +161,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = props => {
     }
 
     if (res?.doc?.verified == false) {
-      setTimeout(() => {
-        Utills.showToast(JSON.stringify(res?.token), '', 'success');
-      }, 2000);
+      // SECURITY: the verification token was being toasted on screen (and onto
+      // the next screen, since navigation happens immediately). Removed — the
+      // OTP is delivered by email/SMS only.
       NavigationService.navigate(RouteNames.AuthRoutes.OtpScreen, {
         nav: {
           condition: 'emaillogin',

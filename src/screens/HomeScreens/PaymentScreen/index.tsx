@@ -145,13 +145,13 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
 
   async function ProgressReportData() {
     let res = await dispatch(getProgressReport(course?._id));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,
       });
     }
-    return res.staus;
+    return res.status;
   }
 
   const handleOnClosePost = async () => {
@@ -171,9 +171,12 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
         promise5,
         promise6,
       ]).then(res => {
-        console.log('pppp', res);
+        // Always clear the loader first. It used to be cleared only on the
+        // success branch, so any follow-up call failing left the user — who had
+        // just PAID — staring at a permanently disabled button on a modal with
+        // no other exit.
+        setbtnLoader(false);
         if (res.every(element => element === true)) {
-          setbtnLoader(false);
           setModalVisible(false);
           NavigationService.navigate(
             RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
@@ -183,7 +186,16 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
             },
           );
         } else {
-          Utills.showToast('Server Error', '', 'error');
+          // The payment itself succeeded; only the post-purchase refresh failed.
+          // Let the user through to their course rather than stranding them.
+          setModalVisible(false);
+          NavigationService.navigate(
+            RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
+            {
+              movetoIndex: 0,
+              movetoCourseDetail: true,
+            },
+          );
         }
       });
     } catch (error) {

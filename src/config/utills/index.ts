@@ -69,8 +69,19 @@ function showToast(
       visibilityTime: visibilityTime || 2000,
     });
   } else {
+    // Defensive: several call sites pass an Error object or a raw API payload.
+    // Rendering a non-string as a React child throws ("Objects are not valid as
+    // a React child") and takes down the screen, so coerce here.
+    const safeMessage =
+      typeof message === 'string' && message.trim()
+        ? message
+        : (message as any)?.message &&
+          typeof (message as any).message === 'string'
+        ? (message as any).message
+        : 'Something Went Wrong';
+
     Toast.show({
-      text1: message || 'Something Went Wrong',
+      text1: safeMessage,
       topOffset: Platform.OS === 'android' ? 10 : 45,
       type: status || 'info',
       visibilityTime: visibilityTime || 2000,
