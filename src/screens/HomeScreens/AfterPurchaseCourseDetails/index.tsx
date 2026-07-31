@@ -71,10 +71,15 @@ export const AfterPurchaseCourseDetails: React.FC<
   const thumbFlatlistRef = useRef<FlatList | null>(null);
   const FOCUS = useIsFocused();
 
+  // Deferred initial scroll. This 500ms timer used to be uncancellable: tapping a
+  // tab within that window let the timer fire afterwards and snap the user back
+  // to movetoIndex (the "tab flicks back to the previous one" bug). Keep a handle
+  // so a user tap — or leaving the screen — cancels it.
+  const initialScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (FOCUS && movetoIndex >= 0) {
-      console.log('play in zero', movetoIndex);
-      setTimeout(() => {
+      initialScrollTimer.current = setTimeout(() => {
         //condition becouse screen index count start from left in android and arabic mode only so for this i implement this condition
         if (Platform.OS == 'android' && I18nManager.isRTL) {
           scrollToActiveIndex(handleArabicNavigation(movetoIndex));
@@ -83,8 +88,16 @@ export const AfterPurchaseCourseDetails: React.FC<
           scrollToActiveIndex(movetoIndex);
           setActiveIndex(movetoIndex);
         }
+        initialScrollTimer.current = null;
       }, 500);
     }
+
+    return () => {
+      if (initialScrollTimer.current) {
+        clearTimeout(initialScrollTimer.current);
+        initialScrollTimer.current = null;
+      }
+    };
   }, [FOCUS]);
 
   function handleBackButtonClick() {
@@ -124,6 +137,12 @@ export const AfterPurchaseCourseDetails: React.FC<
   };
 
   const scrollToActiveIndexonPress = (index: number) => {
+    // The user made an explicit choice — cancel any pending initial auto-scroll
+    // so it can't override the tab they just picked.
+    if (initialScrollTimer.current) {
+      clearTimeout(initialScrollTimer.current);
+      initialScrollTimer.current = null;
+    }
     setActiveIndex(index);
     //condition becouse screen index count start from left in android and arabic mode only so for this i implement this condition
     let androidNavigationCondition = handleArabicNavigation(index);
