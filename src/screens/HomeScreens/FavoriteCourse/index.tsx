@@ -52,10 +52,7 @@ export const FavoriteCourseScreen: React.FC<
         payload: removeLikeObject,
       });      
 
-      dispatch(toggleFavorite('popularCourses', IDD));
-      dispatch(toggleFavorite('trendingCourses', IDD));
-      dispatch(toggleFavorite('recommendedCourses', IDD));
-      dispatch(toggleFavorite('newCourses', IDD));
+      dispatch(toggleFavorite(IDD));
 
     }
   }

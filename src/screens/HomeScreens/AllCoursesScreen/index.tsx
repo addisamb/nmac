@@ -168,10 +168,7 @@ const getNewCoursesData = async () => {
         });
 
 
-        dispatch(toggleFavorite('popularCourses', ID));
-        dispatch(toggleFavorite('trendingCourses', ID));
-        dispatch(toggleFavorite('recommendedCourses', ID));
-        dispatch(toggleFavorite('newCourses', ID));
+        dispatch(toggleFavorite(ID));
       }
     } catch (error) {
       console.error('Error in courselikeAndUnlike:', error);

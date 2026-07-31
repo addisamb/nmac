@@ -64,8 +64,19 @@ export const PrimaryButton: FC<PrimaryButtonProps> = ({
         <ActivityIndicator color={textColor} />
       ) : (
         <CustomText.RegularText
+          // Keep the label on one line and shrink it to fit rather than letting
+          // it be clipped by the button box. Without this, a large system font
+          // scale (accessibility setting) or a longer translation — Arabic runs
+          // longer than English — cut the text off on some devices.
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
           customStyle={[
-            {color: textColor, fontSize: FontType.FontMedium},
+            {
+              color: textColor,
+              fontSize: FontType.FontMedium,
+              textAlign: 'center',
+            },
             secondaryBtn && {color: Utills.selectedThemeColors().Primary},
             textStyles,
           ]}>
@@ -80,8 +91,12 @@ export const PrimaryButton: FC<PrimaryButtonProps> = ({
 // console.log('dadadadadada', );
 const styles = StyleSheet.create({
   buttonContainer: {
-    // borderWidth:1,
-    height: Metrix.VerticalSize(45),
+    // minHeight (not a fixed height) so the button can grow with a large system
+    // font scale instead of clipping its label; horizontal padding keeps text off
+    // the rounded edges.
+    minHeight: Metrix.VerticalSize(45),
+    paddingHorizontal: Metrix.HorizontalSize(12),
+    paddingVertical: Metrix.VerticalSize(6),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: Metrix.VerticalSize(50),

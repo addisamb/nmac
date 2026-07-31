@@ -39,10 +39,7 @@ export const RewardCoursesScreen: React.FC<RewardCoursesScreenProps> = ({ }) => 
     };
     let res = await dispatch(likeAndUnlikeCourse(payload));
     if (res?.status) {
-      dispatch(toggleFavorite('popularCourses', ID));
-      dispatch(toggleFavorite('trendingCourses', ID));
-      dispatch(toggleFavorite('newCourses', ID));
-      dispatch(toggleFavorite('recommendedCourses', ID));
+      dispatch(toggleFavorite(ID));
     }
   }
 
