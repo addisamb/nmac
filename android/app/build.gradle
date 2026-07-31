@@ -83,8 +83,11 @@ android {
         applicationId "com.nmoacademy"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Was the RN template default (1 / "1.0") while iOS shipped 4.2.7 — the two
+        // stores would report different versions for the same release, and a Play
+        // upload would be rejected as a downgrade against anything already live.
+        versionCode 2
+        versionName "4.2.7"
     }
     signingConfigs {
         debug {
@@ -93,15 +96,31 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // Real upload key. Supply these four values OUTSIDE the repo — in
+        // ~/.gradle/gradle.properties locally, or as CI environment variables:
+        //   MYAPP_UPLOAD_STORE_FILE, MYAPP_UPLOAD_STORE_PASSWORD,
+        //   MYAPP_UPLOAD_KEY_ALIAS,  MYAPP_UPLOAD_KEY_PASSWORD
+        // Never commit the keystore or the passwords.
+        release {
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Release was signed with the COMMITTED debug keystore: Play rejects such
+            // an upload outright, and anyone holding the well-known Android debug key
+            // could sign updates for this package. Use the real upload key when its
+            // properties are provided, and fall back to debug only for local/sideload
+            // testing builds (which are not publishable anyway).
+            signingConfig (project.hasProperty('MYAPP_UPLOAD_STORE_FILE') ? signingConfigs.release : signingConfigs.debug)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

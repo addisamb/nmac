@@ -1,16 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Legacy storage: inert on modern Android (WRITE grants nothing from API 29,
+         READ superseded by READ_MEDIA_* from API 33) and, left unbounded, they are
+         flagged by Play as broad storage access. Bound them so they only apply to
+         the OS versions where they do something. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Removed: CAMERA, RECORD_AUDIO, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION.
+         None are exercised anywhere in the app (no geolocation library is even
+         installed; the image picker is only ever opened via openPicker, never
+         openCamera). Declaring them forces a Play Console sensitive-permission
+         declaration — location additionally triggers manual policy review that can
+         block the release — and shows users a permission list the app never uses.
+         Re-add individually if/when a capture or location feature ships. -->
+
 
     <application
       android:name=".MainApplication"
@@ -19,7 +29,6 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme"
-      android:usesCleartextTraffic="true"
       android:supportsRtl="true">
       <activity
         android:name=".MainActivity"
