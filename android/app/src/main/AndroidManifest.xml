@@ -30,6 +30,13 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
+      <!-- Without this, FCM notifications delivered while the app is backgrounded
+           or killed land in Android's auto-created "Miscellaneous" channel at
+           default importance, ignoring the HIGH-importance channel (with sound and
+           vibration) the app creates at startup. -->
+      <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="nmoacademy-25acf" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

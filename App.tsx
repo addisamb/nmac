@@ -231,9 +231,16 @@ function App(): JSX.Element {
       // messaging().requestPermission() is iOS-only — on Android it resolves
       // AUTHORIZED without ever prompting. With targetSdk 33+ POST_NOTIFICATIONS
       // needs a runtime grant, so Android users were silently never asked and
-      // never received notifications. notifee handles the Android 13+ prompt.
+      // never received notifications.
+      //
+      // CreateChannel() both requests that permission and creates the
+      // 'nmoacademy-25acf' channel (importance HIGH, sound, vibration). It was
+      // only ever invoked from the foreground message path, so notifications
+      // arriving while the app was backgrounded/killed fell into Android's
+      // auto-created "Miscellaneous" channel at default importance — no heads-up
+      // banner, no sound, and a channel in Settings that didn't match the app's.
       if (Platform.OS === 'android') {
-        await notifee.requestPermission();
+        await ComFunction.CreateChannel();
       }
 
       const authStatus = await messaging().requestPermission();
