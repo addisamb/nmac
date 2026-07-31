@@ -64,7 +64,9 @@ export function getMediaIcon(path) {
 
     if ( extension == "txt" || extension == "webm" || extension == "webp" || extension == "mp3" || extension == "wav" || extension == "png" || extension == "jpeg" || extension == "jpg" || extension == "wav" || extension == "pdf" )
     {
-      return `http://docs.google.com/gview?embedded=true&url=${url}`
+      // https, not http — this carried course/S3 document URLs in plaintext on the
+    // first hop (only possible because Android had usesCleartextTraffic enabled).
+    return `https://docs.google.com/gview?embedded=true&url=${url}`
     }
     else if (extension == "odt" || extension == "ods" || extension == "odp" || extension == "rtf" || extension == "docx" || extension == "doc" || extension == "ppt" || extension == "pptx" || extension == "xls" || extension == "xlsx")
     {

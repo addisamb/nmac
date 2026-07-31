@@ -288,7 +288,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
 
   async function ProgressReportData() {
     let res = await dispatch(getProgressReport(course?._id));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,

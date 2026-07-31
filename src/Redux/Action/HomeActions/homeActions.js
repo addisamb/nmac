@@ -186,7 +186,11 @@ export const getCategories = () => {
   return dispatch => {
     return api('category', null, 'get', dispatch)
       .then(response => {
-        const modifiedData = response?.data?.responseData.map(item => ({
+        // `responseData` is undefined on any failure (incl. the offline shim), so
+        // the unguarded .map threw inside .then — the catch then toasted an Error
+        // OBJECT, which React cannot render, taking down the whole screen on a
+        // cold start with no connectivity.
+        const modifiedData = (response?.data?.responseData ?? []).map(item => ({
           ...item,
           ischecked: false,
         }));
@@ -195,7 +199,11 @@ export const getCategories = () => {
         return response?.data;
       })
       .catch(error => {
-        Utills.showToast(error);
+        Utills.showToast(
+          error?.message || 'Could not load categories.',
+          '',
+          'error',
+        );
         return false;
       });
   };

@@ -45,8 +45,11 @@ export const MainContainer: React.FC<MainContainerProps> = ({
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
-      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={20}>
+      // Android already resizes the window (windowSoftInputMode="adjustResize"),
+      // so behavior="height" shrank the view a SECOND time — leaving a dead gap
+      // the size of the keyboard. Let Android handle it natively; iOS needs padding.
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
       {/* RN's SafeAreaView handles insets on iOS only. On Android it's a no-op,
           so bottom content/buttons got clipped by the gesture nav bar on some
           devices. Add the bottom inset explicitly on Android (0 on iOS). */}

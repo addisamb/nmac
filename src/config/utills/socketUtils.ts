@@ -42,12 +42,7 @@ export default class Socket {
 
       // let authToken = Store?.getState()?.AuthReducer?.userToken //store.getState().auth.user.token;
 
-      // console.log("check User================", { authorId, authorName });
-      console.log(
-        'dsadsa======chect socket url',
-        DataHandler?.getStore()?.getState()?.AuthReducer?.userToken,
-      );
-
+      // Never log the auth token (this previously printed the live JWT).
       Socket.socket = io(`${BASE_URL}?token=${authToken}`, {
         transports: ['websocket'],
         upgrade: false,

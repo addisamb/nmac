@@ -90,13 +90,13 @@ const WebViewComp = ({route}) => {
   }
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClickk);
-    return () => {
-      BackHandler.removeEventListener(
-        'hardwareBackPress',
-        handleBackButtonClickk,
-      );
-    };
+    // RN 0.81 removed BackHandler.removeEventListener — calling it threw on
+    // unmount (crashing the screen). addEventListener returns a subscription.
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackButtonClickk,
+    );
+    return () => subscription.remove();
   }, []);
 
   function renderLoadingView() {

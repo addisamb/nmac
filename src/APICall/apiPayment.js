@@ -20,6 +20,9 @@ const apiPayment = async (path, params, method,dispatch) => {
       'Content-Type': 'application/json'
     },
     method: method,
+    // Without a timeout axios waits forever on a half-open socket, leaving the
+    // payment flow's loader stuck and the app hard-blocked.
+    timeout: 20000,
     ...(params && { data: JSON.stringify(params) }),
   };
   return axios(CALL_BACK_URL, options)

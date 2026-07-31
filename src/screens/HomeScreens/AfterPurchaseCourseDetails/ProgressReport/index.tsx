@@ -33,7 +33,7 @@ export const ProgressReport: React.FC<ProgressReportProps> = ({}) => {
 
   async function ProgressReportData() {
     let res = await dispatch(getProgressReport(courseDetail?._id));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,

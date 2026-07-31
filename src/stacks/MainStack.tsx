@@ -8,7 +8,7 @@ import { RouteNames } from '../config';
 import ActionType from '../Redux/Action/ActionType/actionType';
 import { AfterOnboard } from './AfterOnboard';
 import { SignupModal } from '../components/SignupModal';
-import { isLogin, Logout, showLoginPleaseModal } from '../Redux/Action/AuthActions/authActions';
+import { isLogin, Logout, showLoginPleaseModal, showSessionExpireModal } from '../Redux/Action/AuthActions/authActions';
 import { RootState } from '../screens/HomeScreens/HomeScreen';
 import { SessionExpire } from '../components/SessionExpire';
 
@@ -86,9 +86,11 @@ export const MainStack = () => {
   }
 
   function closeModalSession() {
-    dispatch(SessionExpire(false));
+    // Was dispatching `SessionExpire` — the imported COMPONENT, not the action
+    // creator. No reducer matched, so the session flag was never cleared and the
+    // full-screen overlay stayed up forever (and persisted across restarts).
+    dispatch(showSessionExpireModal(false));
     setTimeout(() => {
-      // dispatch(Logout());
       dispatch(isLogin("afterOnboard"));
     }, 100);
   }

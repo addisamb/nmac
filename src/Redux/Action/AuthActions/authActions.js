@@ -271,9 +271,10 @@ export const ShowPhoneOtp = (data, navigation) => {
           Utills.showToast(response.data.message, '', 'success');
           dispatch({ type: ActionType.AUTH_LOADER, payload: false });
           let t = response?.data?.token;
-          setTimeout(() => {
-            Utills.showToast(JSON.stringify(t), '', 'success');
-          }, 2000);
+          // SECURITY: the OTP/reset token must never be shown in the requester's
+          // own UI — it is the out-of-band proof of ownership. Displaying it let
+          // anyone reset another account using only their email/phone. It still
+          // reaches the reset flow via redux; delivery is email/SMS only.
           return true;
         }
       })
@@ -318,9 +319,10 @@ export const ForgotPasswordApi = (data, navigation) => {
         } else {
           Utills.showToast(response.data.message, '', 'success');
           let t = response?.data?.token;
-          setTimeout(() => {
-            Utills.showToast(JSON.stringify(t), '', 'success');
-          }, 2000);
+          // SECURITY: the OTP/reset token must never be shown in the requester's
+          // own UI — it is the out-of-band proof of ownership. Displaying it let
+          // anyone reset another account using only their email/phone. It still
+          // reaches the reset flow via redux; delivery is email/SMS only.
           dispatch({ type: ActionType.AUTH_LOADER, payload: false });
           dispatch({ type: ActionType.REST_PASS_TOK, payload: t });
 
@@ -389,9 +391,7 @@ export const ResendOtp = data => {
         } else {
           let t = response?.data?.token;
           dispatch({ type: ActionType.REST_PASS_TOK, payload: t });
-          setTimeout(() => {
-            Utills.showToast(JSON.stringify(t), '', 'success');
-          }, 1000);
+          // SECURITY: OTP/reset token intentionally not displayed (see above).
         }
       })
       .catch(error => {

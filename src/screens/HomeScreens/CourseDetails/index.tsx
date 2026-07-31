@@ -250,13 +250,13 @@ export const CourseDetails: React.FC<CourseDetailsProps> = ({ ...props }) => {
 
   async function ProgressReportData() {
     let res = await dispatch(getProgressReport(ID));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,
       });
     }
-    return res.staus;
+    return res.status;
   }
 
   async function fetchMyCourses() {

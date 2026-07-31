@@ -143,13 +143,13 @@ export const Activity: React.FC<ActivityProps> = ({}) => {
   
   async function ProgressReportData(ID) {
     let res = await dispatch(getProgressReport(ID));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,
       });
     }
-    return res.staus
+    return res.status
   }
   
   async function fetchMyCourses() {

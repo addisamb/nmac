@@ -355,7 +355,7 @@ export const QuizComp: React.FC<QuizCompProps> = ({
 
   async function ProgressReportData() {
     let res = await dispatch(getProgressReport(course?._id));
-    if (res?.staus) {
+    if (res?.status) {
       dispatch({
         type: ActionType.PROGRESS_REPORT,
         payload: res?.data,

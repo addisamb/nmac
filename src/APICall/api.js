@@ -6,12 +6,14 @@ import { showLoginPleaseModal, showSessionExpireModal } from '../Redux/Action/Au
 
 const api = async (path, params, method,dispatch) => {
 
-  let authToken = dataHandlerService?.getStore()?.getState()?.AuthReducer?.userToken 
+  let authToken = dataHandlerService?.getStore()?.getState()?.AuthReducer?.userToken
   let url = BASE_URL + BASE_PATH + path;
-  console.log("====[][]]=====",url,"-", params,"-", "method", method,"---00===",authToken);
+  // NOTE: never log `params` or `authToken` — params carries plaintext passwords
+  // on the auth routes and authToken is a live JWT. Both were previously printed
+  // on every request and are readable from a release device via logcat/Console.
   let options;
   options = {
-    headers: 
+    headers:
     authToken ? {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${authToken}`,
@@ -22,6 +24,10 @@ const api = async (path, params, method,dispatch) => {
       'Content-Type': 'application/json'
     },
     method: method,
+    // Without a timeout axios waits forever. A half-open socket (elevator, captive
+    // portal, backgrounded app) meant the promise never settled, so the loader
+    // flag never reset and the full-screen loader modal hard-blocked the app.
+    timeout: 20000,
     ...(params && { data: JSON.stringify(params) }),
   };
   return axios(url, options)

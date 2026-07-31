@@ -11,7 +11,7 @@ import {
 import { useIsFocused } from '@react-navigation/native';
 import { t } from 'i18next';
 import React, { Dispatch, useEffect, useRef, useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnyAction } from 'redux';
 import { AuthHeader, CustomText, SecondaryButton } from '../../../components';
@@ -171,13 +171,20 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({}) => {
         await _signIn(); // Wait for the _signIn function to complete
       },
     },
-    {
-      name: t('continue_with_apple'),
-      icon: Images.appleLogo,
-      onPress: async () => {
-        await AppleLogin(dispatch);
-      },
-    },
+    // "Continue with Apple" was rendered unconditionally, but the native module
+    // is iOS-only — every Android user who tapped it got a generic failure toast.
+    // Only offer it where it can actually work.
+    ...(Platform.OS === 'ios' && appleAuth.isSupported
+      ? [
+          {
+            name: t('continue_with_apple'),
+            icon: Images.appleLogo,
+            onPress: async () => {
+              await AppleLogin(dispatch);
+            },
+          },
+        ]
+      : []),
   ];
 
   async function SignOut() {
