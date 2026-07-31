@@ -7,7 +7,9 @@ import {DarkModColors, DefaultColors} from '..';
 import { t } from 'i18next';
 import { I18nManager } from 'react-native';
 const passwordRegex =
-  /^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#&*%^]).*$/;
+  // `[\d\x]` was an invalid escape (\x expects hex digits); JS silently treated
+  // it as a literal "x". Written explicitly as [\dx] — same behaviour, valid syntax.
+  /^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\dx])(?=.*[@!$#&*%^]).*$/;
 // const passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])([^\s]){8,16}$/;
 const emailRegex = /^\w+([\.-]?\w+)*@{1}\w+([\.-]?\w+)*(\.[a-zA-Z]{2,3})+$/;
 
@@ -75,8 +77,7 @@ function showToast(
     const safeMessage =
       typeof message === 'string' && message.trim()
         ? message
-        : (message as any)?.message &&
-          typeof (message as any).message === 'string'
+        : typeof (message as any)?.message === 'string'
         ? (message as any).message
         : 'Something Went Wrong';
 
