@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  local-testing branch ONLY. Do not merge this file into main.
+
+  main deliberately has no android:usesCleartextTraffic, so HTTPS is enforced
+  app-wide. This branch points the app at a LAN dev backend over plain http, so
+  cleartext is re-enabled for that ONE host instead of globally: every other
+  destination still requires TLS.
+
+  If the dev machine's LAN IP changes, update the domain below and rebuild.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.162.195</domain>
+    </domain-config>
+</network-security-config>
