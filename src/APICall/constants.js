@@ -6,7 +6,7 @@
 // Phone must be on the SAME Wi-Fi as the dev machine, the local backend must be
 // running on :3100, and inbound TCP 3100 must be allowed by the Windows firewall.
 // If the dev machine's LAN IP changes (DHCP), update it here and rebuild.
-export const BASE_URL = 'http://192.168.136.195:3100/'; // LOCAL DEV (LAN)
+export const BASE_URL = 'http://192.168.162.195:3100/'; // LOCAL DEV (LAN)
 
 export const PAYTABS_BASE_URL = 'https://secure.paytabs.sa/payment/request';
 export const PAYTABS_AUTHERIZATION_KEY = 'SNJNGDLDHD-J6BHNMWBBW-RD99LNG22Z';
