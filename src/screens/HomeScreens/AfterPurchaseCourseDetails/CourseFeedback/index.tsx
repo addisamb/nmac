@@ -55,6 +55,15 @@ export const CourseFeedback: React.FC<CourseFeedbackProps> = ({}) => {
           setModalVisible(true);
         }, 1000);
         setcomnt('');
+      } else {
+        // The server rejects with a reason (e.g. "You have already rated this
+        // course", "You must be enrolled"). It was being swallowed silently, so
+        // tapping submit appeared to do nothing at all.
+        Utills.showToast(
+          res?.message || 'Could not submit your rating. Please try again.',
+          '',
+          'error',
+        );
       }
     }
   }
