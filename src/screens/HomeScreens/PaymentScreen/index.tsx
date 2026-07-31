@@ -59,6 +59,7 @@ import {Alert} from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {
   CALL_BACK_URL,
+  PAYTABS,
   PAYTABS_AUTHERIZATION_KEY,
   PAYTABS_BASE_URL,
 } from '../../../APICall/constants';
@@ -504,9 +505,12 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
     );
 
     let configuration = new PaymentSDKConfiguration();
-    configuration.profileID = '97611';
-    configuration.serverKey = 'S6JNGDLDKN-J6BHNMWBND-LWZRTLZTWW';
-    configuration.clientKey = 'CHKMNQ-TMDN6G-2HQNV2-KRBP29';
+    // Sourced from the single PayTabs config in APICall/constants.js so the
+    // sandbox/live switch is one line and rotation touches one file. (These were
+    // hardcoded here as well as there — two places to miss when rotating.)
+    configuration.profileID = PAYTABS.profileID;
+    configuration.serverKey = PAYTABS.serverKey;
+    configuration.clientKey = PAYTABS.clientKey;
     (configuration.cartID = `${Math.floor(Math.random() * 10000)}`),
       (configuration.currency = 'sar');
     configuration.cartDescription = 'payment for course name test anas';
