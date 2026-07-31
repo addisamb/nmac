@@ -166,7 +166,20 @@ export const CourseDetails: React.FC<CourseDetailsProps> = ({ ...props }) => {
 
   const fetchData = async (_id: string) => {
     let res = await dispatch(getCourseDetails(_id));
-    // console.log('ASDasdadd', res?.responseData?.enrolledStudents);
+    // Graceful degradation: on failure `responseData` is undefined and this used
+    // to commit an object of undefineds to the store — rendering a blank course
+    // page with a live Buy button and no way to retry. Surface the reason and
+    // leave the previous (or empty) state intact instead.
+    if (!res?.status || !res?.responseData) {
+      Utills.showToast(
+        res?.isNetworkError
+          ? 'Unable to load this course. Please check your connection and try again.'
+          : res?.message || 'Could not load this course. Please try again.',
+        '',
+        'error',
+      );
+      return;
+    }
     let data = res?.responseData;
     let object = {
       discountedPrice: JSON.stringify(data?.discountedPrice),
