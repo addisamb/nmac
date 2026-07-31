@@ -309,9 +309,12 @@ export const userEnrolled = id => {
   };
 };
 
-export const toggleFavorite = (categoryId, courseId) => ({
+// Takes only the course id. The reducer flips the course wherever it appears in
+// the feed, so callers no longer have to guess the admin-configured bucket names
+// (they were dispatching four hardcoded guesses per like, none of which matched).
+export const toggleFavorite = courseId => ({
   type: ActionType.TOGGLE_FAVORITE,
-  payload: { categoryId, courseId },
+  payload: { courseId },
 });
 
 //// After course enrolled

@@ -88,15 +88,21 @@ export const SecondaryButton: FC<PrimaryButtonProps> = ({
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-          // borderWidth: 1,
-          // borderColor: 'red',
-          width: '70%',
+          // flex:1 rather than a hard 70% — the label was confined to 70% of the
+          // button regardless of how much room was actually free, so longer
+          // labels (and longer translations) were cut off.
+          flex: 1,
+          paddingHorizontal: Metrix.HorizontalSize(8),
         }}>
         <CustomText.RegularText
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
           customStyle={[
             {
               color: textColor,
               fontSize: FontType.FontMedium,
+              textAlign: 'center',
             },
             textStyle,
           ]}>
@@ -109,8 +115,10 @@ export const SecondaryButton: FC<PrimaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    height: Metrix.VerticalSize(50),
-    // justifyContent: 'center',
+    // minHeight so the button grows with a large system font scale instead of
+    // clipping its label.
+    minHeight: Metrix.VerticalSize(50),
+    paddingVertical: Metrix.VerticalSize(6),
     alignItems: 'center',
     flexDirection: 'row',
     borderRadius: Metrix.VerticalSize(50),

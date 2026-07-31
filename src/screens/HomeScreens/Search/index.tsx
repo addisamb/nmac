@@ -95,10 +95,7 @@ export const Search: React.FC<SearchProps> = ({route}) => {
     };
     let res = await dispatch(likeAndUnlikeCourse(payload));
     if (res?.status) {
-      dispatch(toggleFavorite('popularCourses', ID));
-      dispatch(toggleFavorite('trendingCourses', ID));
-      dispatch(toggleFavorite('recommendedCourses', ID));
-      dispatch(toggleFavorite('newCourses', ID));
+      dispatch(toggleFavorite(ID));
     }
   }
 
@@ -109,10 +106,7 @@ export const Search: React.FC<SearchProps> = ({route}) => {
     };
     let res = await dispatch(likeAndUnlikeCourse(payload));
     if (res?.status) {
-      dispatch(toggleFavorite('popularCourses', ID));
-      dispatch(toggleFavorite('trendingCourses', ID));
-      dispatch(toggleFavorite('recommendedCourses', ID));
-      dispatch(toggleFavorite('newCourses', ID));
+      dispatch(toggleFavorite(ID));
     }
 
     // setsearchData((prevCourses) =>{

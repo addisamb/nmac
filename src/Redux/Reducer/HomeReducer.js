@@ -117,19 +117,36 @@ export default (state = initialState, action) => {
         notifications: action.payload,
       };
     //
-    case ActionType.TOGGLE_FAVORITE:
-      const {categoryId, courseId} = action.payload;
+    case ActionType.TOGGLE_FAVORITE: {
+      // The home feed is a facet whose bucket names come from an ADMIN-CONFIGURABLE
+      // listing order (Redis), e.g. "Trending"/"Popular"/"Recommended". Callers were
+      // dispatching hardcoded guesses ('popularCourses', 'trendingCourses', ...), so
+      // `item[categoryId]` was undefined: the like never showed until the screen
+      // refetched, and `.map` on undefined was a latent crash.
+      //
+      // Flip the course wherever it actually appears instead of trusting a name.
+      const {courseId} = action.payload;
+      const list = Array.isArray(state.courseList) ? state.courseList : [];
+
       return {
         ...state,
-        courseList: state.courseList.map(item => ({
-          ...item,
-          [categoryId]: item[categoryId].map(entry => ({
-            ...entry,
-            isFavourite:
-              entry._id === courseId ? !entry.isFavourite : entry.isFavourite,
-          })),
-        })),
+        courseList: list.map(item => {
+          if (!item || typeof item !== 'object') return item;
+
+          const updated = {...item};
+          Object.keys(updated).forEach(key => {
+            const bucket = updated[key];
+            if (!Array.isArray(bucket)) return;
+            updated[key] = bucket.map(entry =>
+              entry && entry._id === courseId
+                ? {...entry, isFavourite: !entry.isFavourite}
+                : entry,
+            );
+          });
+          return updated;
+        }),
       };
+    }
     case ActionType.QUIZ_AND_ASSIGNMET_DATA:
       return {
         ...state,

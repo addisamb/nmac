@@ -413,10 +413,7 @@ export const CourseDetails: React.FC<CourseDetailsProps> = ({ ...props }) => {
     // setcourseDetailDataLikeStatus(!courseDetailDataLikeStatus);
     let res = await dispatch(likeAndUnlikeCourse(payload));
     if (res?.status) {
-      dispatch(toggleFavorite('popularCourses', ID_course));
-      dispatch(toggleFavorite('trendingCourses', ID_course));
-      dispatch(toggleFavorite('newCourses', ID_course));
-      dispatch(toggleFavorite('recommendedCourses', ID_course));
+      dispatch(toggleFavorite(ID_course));
       fetchDatawithoutLoader(ID);
     }
   }
