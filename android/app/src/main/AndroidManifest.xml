@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Legacy storage: inert on modern Android (WRITE grants nothing from API 29,
@@ -7,8 +8,11 @@
          the OS versions where they do something. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <!-- 29, not 28: react-native-image-crop-picker declares maxSdkVersion=29 and the
+         manifest merger fails on a mismatch. Matching its value avoids an override
+         that would silently narrow that library's storage access on API 29. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -34,9 +38,13 @@
            or killed land in Android's auto-created "Miscellaneous" channel at
            default importance, ignoring the HIGH-importance channel (with sound and
            vibration) the app creates at startup. -->
+      <!-- tools:replace is required: react-native-firebase_messaging declares this
+           same meta-data with an EMPTY value, and the manifest merger fails on the
+           conflict without an explicit override. -->
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="nmoacademy-25acf" />
+        android:value="nmoacademy-25acf"
+        tools:replace="android:value" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
