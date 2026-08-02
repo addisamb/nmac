@@ -6,6 +6,7 @@ import {
   AppState,
   Dimensions,
   I18nManager,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,6 +15,10 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   Colors,
@@ -52,6 +57,15 @@ import {SignupModal} from './src/components/SignupModal';
 import {ErrorBoundary} from './src/components/ErrorBoundary';
 import {PushNotification} from './src/containers';
 // import {getApp} from '@react-native-firebase/app';
+
+// Toast renders outside the navigator, so nothing else pushes it clear of the
+// status bar. Its default topOffset is a flat 40, which lands underneath the
+// camera cutout / punch-hole on most modern Android phones — the toast text was
+// being drawn behind the notch. Offset by the real inset instead.
+const ToastWithInsets: React.FC<{config: any}> = ({config}) => {
+  const insets = useSafeAreaInsets();
+  return <Toast config={config} topOffset={insets.top + Metrix.VerticalSize(8)} />;
+};
 
 function App(): JSX.Element {
   //app
@@ -264,30 +278,39 @@ function App(): JSX.Element {
   dataHandlerService.setStore(Store);
 
   return (
-    <Provider store={Store}>
-      <PersistGate loading={null} persistor={Persistor}>
-        <NavigationContainer
-          ref={ref => NavigationService.setTopLevelNavigator(ref)}
-          theme={{
-            dark: true,
-            colors: {
-              background: Utills.selectedThemeColors().Base,
-              primary: Utills.selectedThemeColors().Base,
-              card: Utills.selectedThemeColors().Base,
-              text: Utills.selectedThemeColors().Base,
-              border: Utills.selectedThemeColors().Base,
-              notification: Utills.selectedThemeColors().Base,
-            },
-          }}>
-          <ErrorBoundary>
-            <MainStack />
-          </ErrorBoundary>
-          <Toast config={toastConfig} />
-          <Loader />
-        </NavigationContainer>
-        <PushNotification />
-      </PersistGate>
-    </Provider>
+    // SafeAreaProvider was missing entirely. react-native-safe-area-context is a
+    // dependency and 15 screens call useSafeAreaInsets()/SafeAreaView from it,
+    // but without this provider every inset resolves to 0 — so on phones with a
+    // gesture bar or a notch, bottom buttons rendered underneath the navigation
+    // bar and headers underneath the status bar, app-wide. This is the single
+    // root cause behind "the bottom buttons on all the pages aren't shown
+    // correctly on some devices".
+    <SafeAreaProvider>
+      <Provider store={Store}>
+        <PersistGate loading={null} persistor={Persistor}>
+          <NavigationContainer
+            ref={ref => NavigationService.setTopLevelNavigator(ref)}
+            theme={{
+              dark: true,
+              colors: {
+                background: Utills.selectedThemeColors().Base,
+                primary: Utills.selectedThemeColors().Base,
+                card: Utills.selectedThemeColors().Base,
+                text: Utills.selectedThemeColors().Base,
+                border: Utills.selectedThemeColors().Base,
+                notification: Utills.selectedThemeColors().Base,
+              },
+            }}>
+            <ErrorBoundary>
+              <MainStack />
+            </ErrorBoundary>
+            <ToastWithInsets config={toastConfig} />
+            <Loader />
+          </NavigationContainer>
+          <PushNotification />
+        </PersistGate>
+      </Provider>
+    </SafeAreaProvider>
   );
 }
 //new

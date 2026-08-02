@@ -1,5 +1,5 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {MyCourseCard} from '../../Courses';
 import {FontType, Images, Metrix, Utills} from '../../../../config';
 import {
@@ -14,7 +14,10 @@ import {normalizeFont} from '../../../../config/metrix';
 import {t} from 'i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {ResetPasswordApi} from '../../../../Redux/Action/AuthActions/authActions';
-import {submitRatting} from '../../../../Redux/Action/HomeActions/homeActions';
+import {
+  getCourseRatings,
+  submitRatting,
+} from '../../../../Redux/Action/HomeActions/homeActions';
 import { AirbnbRating, Rating } from 'react-native-ratings';
 import { RootState } from '../../HomeScreen';
 import ActionType from '../../../../Redux/Action/ActionType/actionType';
@@ -28,8 +31,39 @@ export const CourseFeedback: React.FC<CourseFeedbackProps> = ({}) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [comnt, setcomnt] = useState('');
-  const [starRatting, setstarRatting] = useState('');
+  // 0 = "not rated yet". Was '' with a number assigned to it later, which is
+  // what let a string reach the API.
+  const [starRatting, setstarRatting] = useState<number>(0);
   const [defaultstarRatting, setdefaultstarRatting] = useState(0);
+
+  // Load any rating this user already left for the course and pre-select it.
+  // defaultstarRatting was declared but never assigned, so the stars always
+  // opened empty — there was no way to see your current score, and re-submitting
+  // to change it used to be rejected outright by the server.
+  useEffect(() => {
+    let cancelled = false;
+    if (!id || userData?.type === 'guest') return;
+
+    (async () => {
+      const res = await dispatch(getCourseRatings(id));
+      if (cancelled || !res?.status) return;
+
+      const mine = (res?.responseData || []).find(
+        (r: any) => String(r?.userId) === String(userData?._id),
+      );
+      if (!mine) return;
+
+      setdefaultstarRatting(Number(mine.rating) || 0);
+      // Numeric, not a string — this value is posted straight back to an API
+      // that validates it with @IsNumber().
+      setstarRatting(Number(mine.rating) || 0);
+      if (mine.description) setcomnt(mine.description);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, userData?._id]);
 
   async function Feedback() {
 
@@ -120,11 +154,26 @@ export const CourseFeedback: React.FC<CourseFeedbackProps> = ({}) => {
               // readonly
             /> */}
 
+            {/* React 19 dropped defaultProps for FUNCTION components, and
+                AirbnbRating (TapRating) plus its Star child are both function
+                components that relied on them. `count` came back undefined, so
+                the library's `_.times(count)` produced ZERO stars — the screen
+                showed "0.0" and nothing tappable. TapRating also spreads its own
+                props onto Star, so Star's image/colour defaults are bypassed too
+                and have to be supplied here. (The Rating used on course cards is
+                unaffected: SwipeRating is a class, which keeps defaultProps.) */}
             <AirbnbRating
+                count={5}
                 defaultRating={defaultstarRatting}
                 showRating={false}
                 size={27}
-                onFinishRating={setstarRatting}
+                starImage={require('react-native-ratings/src/images/airbnb-star.png')}
+                selectedColor="#f1c40f"
+                unSelectedColor="#BDC3C7"
+                reviews={[]}
+                // Must stay a NUMBER: the API validates rating with @IsNumber(),
+                // so posting "3" is rejected with "rating must be a number".
+                onFinishRating={(v: number) => setstarRatting(v)}
             />
 
           </View>

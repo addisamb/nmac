@@ -4,6 +4,7 @@ import {createMaterialBottomTabNavigator} from '@react-navigation/material-botto
 import {Activity, Courses, HomeScreen, ProfileScreen, Search} from '../screens';
 import {Colors, Images, Metrix, Utills} from '../config';
 import {MD3DarkTheme, MD3LightTheme, PaperProvider} from 'react-native-paper';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
 import {t} from 'i18next';
 
@@ -78,6 +79,14 @@ export const TabStack: React.FC = ({}) => {
   useEffect(() => {
     changeBottomBtnBarColor();
   }, []);
+
+  // The bar had a hardcoded height, which overrode the inset-aware height the
+  // navigator would otherwise compute. On phones with a gesture bar the tab
+  // label ("Activity", "Profile"…) was drawn in the strip the system navigation
+  // occupies and appeared cut off along the bottom edge. Grow the bar by the
+  // real inset and pad the content clear of it.
+  const insets = useSafeAreaInsets();
+
   return (
     <PaperProvider
       // theme={MD3LightTheme}
@@ -94,7 +103,13 @@ export const TabStack: React.FC = ({}) => {
       <Tab.Navigator
         activeColor={Utills.selectedThemeColors().Primary}
         inactiveColor={Utills.selectedThemeColors().InActiveTabBar}
-        barStyle={styles.barStyle}
+        barStyle={[
+          styles.barStyle,
+          {
+            height: Metrix.VerticalSize(78) + insets.bottom,
+            paddingBottom: insets.bottom,
+          },
+        ]}
         shifting>
         {tabsData?.map((item, index) => (
           <Tab.Screen
@@ -129,7 +144,8 @@ const styles = StyleSheet.create({
     // position: 'absolute',
     bottom: 0,
     backgroundColor: Utills.selectedThemeColors().TextInputBaseColor,
-    height: Metrix.VerticalSize(90),
+    // height/paddingBottom are applied inline so they can include the device's
+    // bottom safe-area inset.
     paddingTop: Metrix.VerticalSize(10),
     paddingHorizontal: Metrix.VerticalSize(20),
     borderTopRightRadius: Metrix.VerticalSize(40),

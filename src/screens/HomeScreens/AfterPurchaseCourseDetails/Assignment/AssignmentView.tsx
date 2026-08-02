@@ -32,7 +32,17 @@ import {useIsFocused} from '@react-navigation/native';
 import navigationService from '../../../../config/navigationService';
 import {QuizComp} from '../QuizAndAssigmnets/QuizComp';
 import metrix from '../../../../config/metrix';
-import DocumentPicker from '@react-native-documents/picker';
+// @react-native-documents/picker v10 has NO default export — only named ones.
+// `import DocumentPicker from ...` therefore resolved to undefined, so
+// DocumentPicker.pick() threw, and the catch block then called
+// DocumentPicker.isCancel() and threw again. The picker never opened and
+// nothing was ever reported: tapping "Upload your files here" did nothing.
+import {
+  pick as pickDocument,
+  types as documentTypes,
+  errorCodes as documentErrorCodes,
+  isErrorWithCode as isDocumentErrorWithCode,
+} from '@react-native-documents/picker';
 import axios from 'axios';
 import {BASE_URL} from '../../../../APICall/constants';
 import colors from '../../../../config/colors';
@@ -225,7 +235,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
 
   const selectDoc = async () => {
     try {
-      const result = await DocumentPicker.pick({
+      const result = await pickDocument({
         // type: [DocumentPicker.types.audio,
         //   DocumentPicker.types.csv,
         //   DocumentPicker.types.doc,
@@ -238,7 +248,7 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
         //   DocumentPicker.types.xlsx,
         //   DocumentPicker.types.zip,
         // ],
-        type: [DocumentPicker.types.allFiles],
+        type: [documentTypes.allFiles],
       });
 
       if (Array.isArray(result) && result.length > 0) {
@@ -267,11 +277,22 @@ export const AssignmentView: React.FC<AssignmentViewProps> = ({
         console.log('No document selected');
       }
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        console.log('User cancelled the upload', err);
-      } else {
-        console.log('Error picking document', err);
+      if (
+        isDocumentErrorWithCode(err) &&
+        err.code === documentErrorCodes.OPERATION_CANCELED
+      ) {
+        // Backing out of the file browser is not an error.
+        return;
       }
+      // Previously only console.logged, so an upload that failed (expired
+      // session, file too large, server down) looked identical to one that
+      // silently did nothing. Tell the user something went wrong.
+      console.log('Error picking/uploading document', err);
+      Utills.showToast(
+        t('something_went_wrong_server_error'),
+        null,
+        'error',
+      );
     }
   };
 

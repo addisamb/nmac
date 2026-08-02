@@ -125,35 +125,50 @@ async function fetchMyCourses() {
   const handleOnClosePost = async () => {
     setgotoCourseBtnLoader(true)
     try {
-      // dispatch({type: ActionType.HOME_LOADER, payload: true});
-      const promise1 = getQuizes();
-      const promise2 = getAssignment();
-      const promise3 = bonusMaterialData();
-      const promise4 = ProgressReportData();
-      const promise5 = fetchMyCourses()
-      await Promise.all([promise1, promise2, promise3, promise4,promise5]).then((res) => {    
-            
-        if (res.every((element) => element === true)) {       
-          // dispatch({type: ActionType.HOME_LOADER, payload: false});   
-          setModalVisible(false);
-          NavigationService.navigate(
-            RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
-            {
-              movetoIndex: 0,
-              movetoCourseDetail: true,
-            },
-            );
-          setgotoCourseBtnLoader(false)
-        } else {
-          // dispatch({type: ActionType.HOME_LOADER, payload: false});
-          setgotoCourseBtnLoader(false)
-          Utills.showToast('Server Error', '', 'error');
-        }
-      });
+      // This runs AFTER the payment has already been taken. Refreshing the
+      // course tabs is a convenience; failing it must never be the reason a
+      // paying student is denied the course they just bought. Previously any
+      // one of these returning non-true showed "Server Error" and left the
+      // user on the payment webview with no way into their purchase.
+      const results = await Promise.allSettled([
+        getQuizes(),
+        getAssignment(),
+        bonusMaterialData(),
+        ProgressReportData(),
+        fetchMyCourses(),
+      ]);
+
+      setgotoCourseBtnLoader(false)
+      setModalVisible(false);
+
+      if (results.some(r => r.status === 'rejected' || !r.value)) {
+        // Surface that some content may be missing, but still let them in.
+        Utills.showToast(
+          t('something_went_wrong_server_error'),
+          null,
+          'warning',
+        );
+      }
+
+      NavigationService.navigate(
+        RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
+        {
+          movetoIndex: 0,
+          movetoCourseDetail: true,
+        },
+      );
     } catch (error) {
       setgotoCourseBtnLoader(false)
       dispatch({type: ActionType.HOME_LOADER, payload: false});
-      Utills.showToast(error, '', 'error');
+      // Even here the purchase succeeded — send them to the course anyway.
+      setModalVisible(false);
+      NavigationService.navigate(
+        RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
+        {
+          movetoIndex: 0,
+          movetoCourseDetail: true,
+        },
+      );
     }
   };
 

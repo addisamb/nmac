@@ -1,6 +1,5 @@
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
-import {Platform} from 'react-native';
 import DataHandler from '../../services/dataHandler.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DarkModColors, DefaultColors} from '..';
@@ -46,7 +45,9 @@ function showToast(
   if (err === 'timeout of 10000ms exceeded') {
     Toast.show({
       text1: 'Connectivity Issue',
-      topOffset: Platform.OS === 'android' ? 10 : 60,
+      // topOffset intentionally omitted: the <Toast> at the app root sets it
+      // from the real safe-area inset. A hardcoded 10 on Android drew the toast
+      // behind the status bar and camera cutout on modern phones.
       type: status || 'info',
       visibilityTime: visibilityTime || 2000,
     });
@@ -54,7 +55,9 @@ function showToast(
     Toast.show({
       text1: 'You have lost internet connection',
       type: status || 'info',
-      topOffset: Platform.OS === 'android' ? 10 : 60,
+      // topOffset intentionally omitted: the <Toast> at the app root sets it
+      // from the real safe-area inset. A hardcoded 10 on Android drew the toast
+      // behind the status bar and camera cutout on modern phones.
       visibilityTime: visibilityTime || 2000,
     });
   } else if (message === 'Login to access') {
@@ -67,7 +70,9 @@ function showToast(
     Toast.show({
       text1: 'User does not exist',
       type: status || 'info',
-      topOffset: Platform.OS === 'android' ? 10 : 60,
+      // topOffset intentionally omitted: the <Toast> at the app root sets it
+      // from the real safe-area inset. A hardcoded 10 on Android drew the toast
+      // behind the status bar and camera cutout on modern phones.
       visibilityTime: visibilityTime || 2000,
     });
   } else {
@@ -83,7 +88,7 @@ function showToast(
 
     Toast.show({
       text1: safeMessage,
-      topOffset: Platform.OS === 'android' ? 10 : 45,
+      // See note above — inset-aware topOffset comes from the root <Toast>.
       type: status || 'info',
       visibilityTime: visibilityTime || 2000,
     });

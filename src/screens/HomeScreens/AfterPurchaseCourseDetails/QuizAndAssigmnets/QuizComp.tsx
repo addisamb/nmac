@@ -31,7 +31,9 @@ import {
 } from '../../../../Redux/Action/HomeActions/homeActions';
 import {useDispatch} from 'react-redux';
 import {Image} from 'react-native';
-import CountDown from 'react-native-countdown-component';
+// Was react-native-countdown-component, which crashed on unmount by calling the
+// removed AppState.removeEventListener — i.e. on every quiz submission.
+import {QuizCountdown as CountDown} from '../../../../components/QuizCountdown';
 import navigationService from '../../../../config/navigationService';
 import {useNavigation} from '@react-navigation/native';
 import {MyCourses} from '../../../../Redux/Action/CourseAction/CourseAction';

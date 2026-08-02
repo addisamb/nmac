@@ -74,7 +74,11 @@ export const RoundBorderCardComponent: React.FC<RoundBorderCardProps> = ({
       <View
       style={[{
         // borderWidth:1,
-        flexDirection:"row"
+        flexDirection:"row",
+        // Without flex:1 this row sized itself to its content and overflowed the
+        // card, so long notification text ran off the right edge of the screen
+        // instead of wrapping/ellipsizing inside the card.
+        flex: 1,
       }, customViewStyle]}
       >
         <View>
@@ -226,8 +230,12 @@ const styles = StyleSheet.create({
     marginRight: Metrix.HorizontalSize(10),
   },
   textContainer: {
-    // borderWidth: 1,
-    // width: Metrix.HorizontalSize(200),
+    // Takes the space left after the icon (and the amount, when present) rather
+    // than a hardcoded 200 — that fixed width was why text was clipped on narrow
+    // screens and left a gap on wide ones. numberOfLines can only ellipsize once
+    // the text actually has a bounded width to wrap within.
+    flex: 1,
+    minWidth: 0,
   },
   textStyle: {
     // borderWidth: 1,

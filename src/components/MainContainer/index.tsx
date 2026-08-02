@@ -14,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useKeyboardInset} from '../../config/hooks/useKeyboardInset';
 import {Colors, Metrix, Utills} from '../../config';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/reducers';
@@ -42,20 +43,32 @@ export const MainContainer: React.FC<MainContainerProps> = ({
   const darkMode = useSelector((state: RootState) => state?.home?.darkMode);
   const insets = useSafeAreaInsets();
 
+  // One mechanism for the whole app. KeyboardAvoidingView derives its offset
+  // from its own measured frame, which does not survive being nested (it failed
+  // outright inside the course-detail tab list) and, under the edge-to-edge that
+  // Android 15+ enforces at targetSdk 36, it also stops short by the height of
+  // the navigation bar. useKeyboardInset reads the keyboard height from the
+  // Keyboard event and corrects for both the nav bar and any window resize.
+  const keyboardInset = useKeyboardInset();
+
+  // Closed: clear the gesture/navigation bar. Open: clear the keyboard, which
+  // already includes that same nav-bar allowance — so these must not be added
+  // together or the content would jump up by the nav bar height twice.
+  const bottomPadding =
+    keyboardInset > 0
+      ? keyboardInset
+      : Platform.OS === 'android'
+      ? insets.bottom
+      : 0;
+
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1}}
-      // Android already resizes the window (windowSoftInputMode="adjustResize"),
-      // so behavior="height" shrank the view a SECOND time — leaving a dead gap
-      // the size of the keyboard. Let Android handle it natively; iOS needs padding.
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
+    <View style={{flex: 1}}>
       {/* RN's SafeAreaView handles insets on iOS only. On Android it's a no-op,
           so bottom content/buttons got clipped by the gesture nav bar on some
           devices. Add the bottom inset explicitly on Android (0 on iOS). */}
       <SafeAreaView
         style={[
-          {flex: 1, paddingBottom: Platform.OS === 'android' ? insets.bottom : 0},
+          {flex: 1, paddingBottom: bottomPadding},
           mainContainerStyle,
         ]}>
         <StatusBar
@@ -82,7 +95,7 @@ export const MainContainer: React.FC<MainContainerProps> = ({
         )}
       </SafeAreaView>
       {/* <NoInternet isOffline={true} /> */}
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

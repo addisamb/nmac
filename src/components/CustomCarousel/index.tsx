@@ -1,15 +1,19 @@
 import { t } from 'i18next';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
-  Dimensions,
+  FlatList,
   I18nManager,
   Image,
   Platform,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import Carousel from 'react-native-snap-carousel';
-import { CustomImage, MultipleHeadingComponent } from '..';
+// Imported from their own folders rather than the '..' barrel. The barrel
+// imports this file, so pulling from it created a require cycle — on the cycle's
+// second edge the module object resolves to undefined.
+import { CustomImage } from '../CustomImage';
+import { MultipleHeadingComponent } from '../MultipleHeadingComponent';
 import { Images, Metrix, NavigationService, RouteNames } from '../../config';
 
 interface CarouselItem {
@@ -21,22 +25,50 @@ interface CarouselComponentProps {
   carouselData: CarouselItem[];
 }
 
+/**
+ * Was built on react-native-snap-carousel@3.9.1, which references ViewPropTypes
+ * — removed from React Native years ago and absent in 0.81. The library threw
+ * while being evaluated, leaving this module undefined, so the first render of
+ * <CustomCarousel> crashed the app with "Cannot read property 'CustomCarousel'
+ * of undefined". That render only happens once a Top Category is selected, which
+ * is why tapping a category killed the app.
+ *
+ * Rebuilt on FlatList: paging, snapping and the prev/next arrows are all native
+ * behaviour, so the unmaintained dependency is no longer needed at all.
+ */
 export const CustomCarousel: React.FC<CarouselComponentProps> = ({
   carouselData,
 }) => {
-  const screenWidth = Dimensions.get('window').width;
-  const screenHeight = Dimensions.get('window').width;
-  const carouselRef = useRef<Carousel<CarouselItem>>(null);
+  const { width: screenWidth } = useWindowDimensions();
+  const listRef = useRef<FlatList<CarouselItem>>(null);
+  const [index, setIndex] = useState(0);
 
-  console.log('carouselData in custom carousel=====>>>', carouselData);
+  const ITEM_HEIGHT = Metrix.VerticalSize(144);
+  const H_PADDING = Metrix.VerticalSize(15);
+  const itemWidth = Math.max(1, screenWidth - H_PADDING * 2);
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: CarouselItem;
-    index: number;
-  }) => (
+  const data = Array.isArray(carouselData) ? carouselData : [];
+
+  const goTo = useCallback(
+    (next: number) => {
+      if (!data.length) return;
+      // Wrap around at both ends so the arrows never dead-end.
+      const target = (next + data.length) % data.length;
+      setIndex(target);
+      listRef.current?.scrollToIndex({ index: target, animated: true });
+    },
+    [data.length],
+  );
+
+  const onMomentumEnd = useCallback(
+    (e: any) => {
+      const x = e?.nativeEvent?.contentOffset?.x ?? 0;
+      setIndex(Math.round(x / itemWidth));
+    },
+    [itemWidth],
+  );
+
+  const renderItem = ({ item }: { item: CarouselItem; index: number }) => (
     // console.log('carouselData=====>>>', item?._id),
     <TouchableOpacity
       activeOpacity={0.8}
@@ -47,82 +79,23 @@ export const CustomCarousel: React.FC<CarouselComponentProps> = ({
         })
       }
       style={{
-        flex: 1,
-        // borderWidth: 1,
+        width: itemWidth,
+        height: ITEM_HEIGHT,
         borderRadius: Metrix.VerticalSize(10), // Add rounded border
         overflow: 'hidden', // Hide content outside the border
-        // justifyContent: 'center',
-        // ...Metrix.createShadow,
-        // elevation: 5, // Add elevation for a shadow effect
       }}
     >
       <Image
-        source={{ uri: item?.courseMedia }}
+        source={
+          // A missing/blank courseMedia used to render a broken empty box.
+          item?.courseMedia ? { uri: item.courseMedia } : Images.Course1
+        }
         resizeMode="cover"
         style={{ width: '100%', height: '100%' }}
       />
 
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          top: '50%',
-          //   paddingHorizontal: 20,
-          //   marginTop: 10,
-          // borderWidth: 1,
-          position: 'absolute',
-          width: '100%',
-          // bottom: Metrix.VerticalSize(80),
-        }}
-      >
-        <TouchableOpacity onPress={() => carouselRef.current?.snapToPrev()}>
-          <CustomImage
-            source={Images.CircleArrowLeft}
-            customStyle={{
-              transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
-            }}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => carouselRef.current?.snapToNext()}>
-          <CustomImage
-            source={Images.CircleArrowRight}
-            customStyle={{
-              transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
-            }}
-          />
-        </TouchableOpacity>
-      </View> */}
-
-      {carouselData && carouselData.length > 1 && (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            top: '50%',
-            position: 'absolute',
-            width: '100%',
-          }}
-        >
-          <TouchableOpacity onPress={() => carouselRef.current?.snapToPrev()}>
-            <CustomImage
-              source={Images.CircleArrowLeft}
-              customStyle={{
-                transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => carouselRef.current?.snapToNext()}>
-            <CustomImage
-              source={Images.CircleArrowRight}
-              customStyle={{
-                transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* The prev/next arrows used to be rendered inside every slide, so each
+          one carried its own pair. They are now a single overlay below. */}
     </TouchableOpacity>
   );
 
@@ -135,40 +108,62 @@ export const CustomCarousel: React.FC<CarouselComponentProps> = ({
       />
       <View
         style={{
-          paddingHorizontal: Metrix.VerticalSize(15),
+          paddingHorizontal: H_PADDING,
           top: Platform.OS == 'ios' ? -10 : -5,
         }}
       >
-        <Carousel
-          ref={carouselRef}
-          sliderWidth={screenWidth}
-          sliderHeight={Metrix.VerticalSize(200)}
-          itemWidth={screenWidth}
-          itemHeight={Metrix.VerticalSize(144)} // Adjust the height as needed
-          layout="stack" // Use stack layout
-          layoutCardOffset={7} // Adjust this value for the desired position
-          vertical
-          data={carouselData}
+        <FlatList
+          ref={listRef}
+          data={data}
           renderItem={renderItem}
-          // lockScrollWhileSnapping
+          keyExtractor={(item, i) => String(item?._id ?? item?.id ?? i)}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onMomentumEnd}
+          // Fixed-width items, so the list can jump straight to an index
+          // without measuring — required for scrollToIndex to be reliable.
+          getItemLayout={(_d, i) => ({
+            length: itemWidth,
+            offset: itemWidth * i,
+            index: i,
+          })}
+          // RTL: RN flips a horizontal list natively, so no manual inversion.
+          style={{ height: ITEM_HEIGHT }}
         />
 
-        {/* {carouselData && carouselData.length > 0 && (
-          <Carousel
-            ref={carouselRef}
-            sliderWidth={screenWidth}
-            sliderHeight={Metrix.VerticalSize(200)}
-            itemWidth={screenWidth}
-            itemHeight={Metrix.VerticalSize(144)}
-            data={carouselData}
-            renderItem={renderItem}
-            layout="stack"
-            layoutCardOffset={7}
-            vertical
-          />
-        )} */}
+        {data.length > 1 && (
+          <View
+            pointerEvents="box-none"
+            style={{
+              position: 'absolute',
+              left: H_PADDING,
+              right: H_PADDING,
+              top: ITEM_HEIGHT / 2 - Metrix.VerticalSize(15),
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <TouchableOpacity onPress={() => goTo(index - 1)}>
+              <CustomImage
+                source={Images.CircleArrowLeft}
+                customStyle={{
+                  transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+                }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => goTo(index + 1)}>
+              <CustomImage
+                source={Images.CircleArrowRight}
+                customStyle={{
+                  transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-      {/* Add round buttons */}
     </View>
   );
 };

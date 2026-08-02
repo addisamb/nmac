@@ -51,7 +51,8 @@ import {useIsFocused} from '@react-navigation/native';
 import Socket, {SocketTypes} from '../../../../config/utills/socketUtils';
 import {useDispatch, useSelector} from 'react-redux';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {KeyboardAwareView} from 'react-native-keyboard-aware-view';
+// react-native-keyboard-aware-view removed — see the note at its former usage.
+import {useKeyboardInset} from '../../../../config/hooks/useKeyboardInset';
 import {StatusBar} from 'react-native';
 import axios from 'axios';
 import {
@@ -547,6 +548,9 @@ export const Chat: React.FC<ChatProps> = (route) => {
   const dispatch = useDispatch();
   const keyboardOpen = useRef(null);
 
+  // Bottom padding that keeps the comment box above the keyboard.
+  const keyboardInset = useKeyboardInset();
+
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   // const [showSheet, setshowSheet] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -852,11 +856,22 @@ export const Chat: React.FC<ChatProps> = (route) => {
   return (
     <View style={{flex: 1}}>
       <SafeAreaView style={{flex: 1}}>
-        <KeyboardAwareView
-          animated={true}
-          doNotForceDismissKeyboardWhenLayoutChanges={true}
-          keyboardShouldPersistTaps={'always'}
-          scrollEnabled={true}>
+        {/* Three approaches failed here before this one:
+            1. react-native-keyboard-aware-view — subscribes only to the iOS-only
+               keyboardWillShow/Hide events, so it did nothing on Android.
+            2. KeyboardAvoidingView with behavior undefined on Android — relies
+               on windowSoftInputMode="adjustResize", which no longer resizes the
+               window under the edge-to-edge that Android 15+ enforces at the
+               targetSdk 36 this app builds against.
+            3. KeyboardAvoidingView with behavior="padding" — positions itself
+               from its own measured frame, and this screen renders inside a
+               horizontal FlatList item in the course-detail tabs, where that
+               measurement does not come out right.
+
+            useKeyboardInset sidesteps all of it: it reads the keyboard height
+            from the Keyboard event and subtracts whatever the window already
+            shrank, so it is correct whether or not the OS resizes. */}
+        <View style={{flex: 1, paddingBottom: keyboardInset}}>
           {/* <ScrollView    keyboardShouldPersistTaps={'handled'}     scrollEnabled={true} > */}
 
           {/* <TouchableOpacity onPress={()=>{ FileDownloadExample() }} >
@@ -871,6 +886,11 @@ export const Chat: React.FC<ChatProps> = (route) => {
             ListEmptyComponent={EmptyListChat}
             // ListFooterComponent={<View style={{ height: 50 }} />}
             keyExtractor={(item, index) => index.toString()}
+            // flex:1 so the list takes the space left over ABOVE the comment box
+            // and scrolls internally. Without it the list sizes to its content,
+            // and a long conversation pushes the input off the bottom.
+            style={{flex: 1}}
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               marginHorizontal: Metrix.HorizontalSize(20),
             }}
@@ -1007,7 +1027,7 @@ export const Chat: React.FC<ChatProps> = (route) => {
               }}
             />
           </View>
-        </KeyboardAwareView>
+        </View>
         {RenderModalAchievement()}
       </SafeAreaView>
     </View>
