@@ -162,6 +162,16 @@ export const AfterPurchaseCourseDetails: React.FC<
   };
 
   function hndleNavigation(index) {
+    // Cancel the pending initial auto-scroll here, at the single user-tap entry
+    // point. Only the Android+RTL branch below used to do this, so on every
+    // other device tapping a tab within the first 500ms let the timer fire
+    // afterwards and yank the user back to movetoIndex — the tab appeared to
+    // open and then immediately flick back to the previous one.
+    if (initialScrollTimer.current) {
+      clearTimeout(initialScrollTimer.current);
+      initialScrollTimer.current = null;
+    }
+
     if (Platform.OS == 'android' && I18nManager.isRTL) {
       scrollToActiveIndexonPress(index);
     } else {
@@ -464,13 +474,38 @@ export const AfterPurchaseCourseDetails: React.FC<
             // style={{borderWidth: 2, borderColor: 'blue'}}
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={({nativeEvent}) => {
-              scrollToActiveIndex(
-                Math.floor(nativeEvent.contentOffset.x / width),
-              );
-              console.log('===>>> scrollToActiveIndex', scrollToActiveIndex);
+              // Math.floor was wrong here. Screen width in dp is usually
+              // fractional (1080px / 2.625 = 411.4285…), so after scrolling to
+              // tab N the reported offset lands a hair BELOW N * width and
+              // floor() rounded it down to N-1. This handler then scrolled back
+              // to N-1 — the tab opened and immediately snapped to the previous
+              // one, and whether it did depended on how the float error landed,
+              // which is why only some tabs appeared to work.
+              const landed = Math.round(nativeEvent.contentOffset.x / width);
+              const clamped = Math.min(Math.max(landed, 0), data.length - 1);
+              // Only react to a genuine change; re-issuing the same index
+              // triggers another animated scroll and another momentum event.
+              if (clamped !== activeIndex) {
+                setActiveIndex(clamped);
+              }
             }}
             renderItem={renderFullScreenItem}
             keyExtractor={item => item.id.toString()}
+            // Every tab is exactly one screen wide, so declare the geometry
+            // instead of letting the list measure it. Without this, scrolling to
+            // a tab that had not been laid out yet clamped to the current
+            // content width and stopped short of the requested tab.
+            getItemLayout={(_d, i) => ({
+              length: width,
+              offset: width * i,
+              index: i,
+            })}
+            // Only 7 tabs — keep them all mounted so switching is instant and
+            // offsets stay correct.
+            initialNumToRender={data.length}
+            maxToRenderPerBatch={data.length}
+            windowSize={data.length}
+            removeClippedSubviews={false}
           />
         </View>
       </View>

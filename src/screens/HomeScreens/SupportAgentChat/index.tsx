@@ -4,6 +4,8 @@ import {
   FlatList,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -41,7 +43,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../HomeScreen';
 import {normalizeFont} from '../../../config/metrix';
-import {KeyboardAwareView} from 'react-native-keyboard-aware-view';
+// react-native-keyboard-aware-view removed — iOS-only keyboard events.
+import {useKeyboardInset} from '../../../config/hooks/useKeyboardInset';
 import {CommentAndReply} from '../AfterPurchaseCourseDetails/Chat';
 import Socket, { SocketTypes } from '../../../config/utills/socketUtils';
 import MyMessageView from './myMessageView';
@@ -95,6 +98,8 @@ export const chatData = [
 
 
 export const SupportAgentChat: React.FC<SupportAgentChatProps> = ({...props}) => {
+  // Keeps the message input clear of the keyboard.
+  const keyboardInset = useKeyboardInset();
 
   const { msg } = props?.route?.params
 
@@ -241,7 +246,13 @@ export const SupportAgentChat: React.FC<SupportAgentChatProps> = ({...props}) =>
 
       <View style={{flex: 1}}>
         <SafeAreaView style={{flex: 1}}>
-        <KeyboardAwareView animated={true}>
+        {/* KeyboardAwareView only listened for the iOS-only
+            keyboardWillShow/Hide events, so on Android the keyboard covered the
+            message input. See the note in AfterPurchaseCourseDetails/Chat. */}
+        {/* Keyboard handling via useKeyboardInset rather than
+            KeyboardAvoidingView — see the note in
+            AfterPurchaseCourseDetails/Chat. */}
+        <View style={{flex: 1, paddingBottom: keyboardInset}}>
 
         <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} contentContainerStyle={{
           paddingBottom: Metrix.VerticalSize(20),
@@ -308,7 +319,7 @@ export const SupportAgentChat: React.FC<SupportAgentChatProps> = ({...props}) =>
            />
          </View>
 
-</KeyboardAwareView>
+</View>
 
         </SafeAreaView>
       </View>

@@ -4,6 +4,8 @@ import {
     FlatList,
     Image,
     Keyboard,
+    KeyboardAvoidingView,
+    Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -41,7 +43,8 @@ import {
   import {useDispatch, useSelector} from 'react-redux';
   import {RootState} from '../HomeScreen';
   import {normalizeFont} from '../../../config/metrix';
-  import {KeyboardAwareView} from 'react-native-keyboard-aware-view';
+  // react-native-keyboard-aware-view removed — iOS-only keyboard events.
+  import {useKeyboardInset} from '../../../config/hooks/useKeyboardInset';
   import {CommentAndReply} from '../AfterPurchaseCourseDetails/Chat';
   import Socket from '../../../config/utills/socketUtils';
   import MyMessageView from '../SupportAgentChat/myMessageView';
@@ -94,6 +97,8 @@ import {
   
   
   export const QuestionChatFlow: React.FC<QuestionChatFlowProps> = ({active}) => {
+  // Keeps the message input clear of the keyboard.
+  const keyboardInset = useKeyboardInset();
   
     const dispatch = useDispatch();
     const scrollRef = useRef(null);
@@ -173,7 +178,11 @@ import {
   
         <View style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
-          <KeyboardAwareView animated={true}>
+          {/* Keyboard handling via useKeyboardInset rather than
+              KeyboardAvoidingView — see the note in
+              AfterPurchaseCourseDetails/Chat for why the library and both
+              KeyboardAvoidingView configurations failed on Android. */}
+          <View style={{flex: 1, paddingBottom: keyboardInset}}>
   
           <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} contentContainerStyle={{
             paddingBottom: 20,
@@ -213,7 +222,7 @@ import {
              />
            </View>
   
-  </KeyboardAwareView>
+  </View>
   
           </SafeAreaView>
         </View>

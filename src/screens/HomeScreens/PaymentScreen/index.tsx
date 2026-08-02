@@ -239,7 +239,10 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
       });
       return res;
     } else {
-      Utills.showToast(t('something_went_wrong_server_error'), '', t('error'));
+      // t('error') only resolved to 'error' because no such key exists and
+      // i18next echoes unknown keys back. Adding an 'error' translation later
+      // would silently turn this into an untyped toast — pass the literal.
+      Utills.showToast(t('something_went_wrong_server_error'), null, 'error');
       return;
     }
   }
@@ -341,8 +344,10 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
     if (response?.status) {
       setModalVisible(true);
     } else {
-      // Utills.showToast(t('something_went_wrong_server_error'), '', t('error'));
-      Utills.showToast(t('something went wrong server error'), '', t('error'));
+      // The key needs underscores — with spaces i18next finds nothing and shows
+      // the raw key. The third argument is the toast TYPE, not display text, so
+      // it must stay the literal 'error' rather than a translated string.
+      Utills.showToast(t('something_went_wrong_server_error'), null, 'error');
     }
   }
 
@@ -400,11 +405,11 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({...props}) => {
         })
         .catch(error => {
           setbtnLoader(false);
-          // Utills.showToast(t('something_went_wrong_server_error'), '', t('error'));
+          // Underscored key + literal toast type — see note above.
           Utills.showToast(
-            t('something went wrong server error'),
-            '',
-            t('error'),
+            t('something_went_wrong_server_error'),
+            null,
+            'error',
           );
         });
     }

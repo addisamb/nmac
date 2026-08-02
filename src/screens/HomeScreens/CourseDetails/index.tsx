@@ -175,7 +175,7 @@ export const CourseDetails: React.FC<CourseDetailsProps> = ({ ...props }) => {
         res?.isNetworkError
           ? 'Unable to load this course. Please check your connection and try again.'
           : res?.message || 'Could not load this course. Please try again.',
-        '',
+        null,
         'error',
       );
       return;
@@ -301,38 +301,61 @@ export const CourseDetails: React.FC<CourseDetailsProps> = ({ ...props }) => {
     try {
       setloading(true);
       dispatch({ type: ActionType.HOME_LOADER, payload: true });
-      const promise1 = getQuizes();
-      const promise2 = getAssignment();
-      const promise3 = bonusMaterialData();
-      const promise4 = ProgressReportData();
-      const promise5 = fetchMyCourses();
 
-      await Promise.all([
-        promise1,
-        promise2,
-        promise3,
-        promise4,
-        promise5,
-      ]).then(res => {
-        dispatch({ type: ActionType.HOME_LOADER, payload: false });
-        if (res.every(element => element === true)) {
-          NavigationService.navigate(
-            RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
-            {
-              movetoIndex: 0,
-              movetoCourseDetail: true,
-            },
-          );
-          setloading(false);
-        } else {
-          setloading(false);
-          Utills.showToast('Server Error', '', 'error');
-        }
-      });
+      // These five feed the tabs inside the course. They are supplementary:
+      // a course with no quizzes, no assignments or no progress yet is normal,
+      // and one of them failing is not a reason to refuse to open the course.
+      //
+      // Previously this required all five to resolve to exactly `true` and
+      // otherwise showed "Server Error" and navigated nowhere — so any single
+      // failing (or merely empty) endpoint made the course impossible to open.
+      // allSettled also means one rejection no longer discards the other four,
+      // which used to leave the tabs holding stale data from a previous course.
+      const results = await Promise.allSettled([
+        getQuizes(),
+        getAssignment(),
+        bonusMaterialData(),
+        ProgressReportData(),
+        fetchMyCourses(),
+      ]);
+
+      dispatch({ type: ActionType.HOME_LOADER, payload: false });
+      setloading(false);
+
+      const succeeded = results.filter(
+        r => r.status === 'fulfilled' && r.value,
+      ).length;
+
+      // Only a total wipeout means the device genuinely can't reach the backend;
+      // anything less is a partially-populated course, which is still usable.
+      if (succeeded === 0) {
+        Utills.showToast(
+          t('something_went_wrong_server_error'),
+          null,
+          'error',
+        );
+        return;
+      }
+
+      NavigationService.navigate(
+        RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
+        {
+          movetoIndex: 0,
+          movetoCourseDetail: true,
+        },
+      );
     } catch (error) {
       dispatch({ type: ActionType.HOME_LOADER, payload: false });
       setloading(false);
-      Utills.showToast(error, '', 'error');
+      // showToast renders its argument as a title; an Error object rendered as
+      // a React child would crash the screen it is trying to report on.
+      Utills.showToast(
+        error instanceof Error
+          ? error.message
+          : t('something_went_wrong_server_error'),
+        null,
+        'error',
+      );
     }
   };
 

@@ -4,8 +4,10 @@ import {
   ImageProps,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import React, {useEffect, useRef, useState, useTransition} from 'react';
 import {CustomText, FadeContainer, PrimaryButton} from '../../../components';
 import {
@@ -103,20 +105,24 @@ export const Next: React.FC<{isLight: any}> = ({isLight, ...props}) => {
   );
 };
 
-const ImageComp: React.FC<{source: ImageProps['source']}> = ({source}) => (
-  <View
-    style={{
-      // borderWidth: 1,
-      width: '80%',
-      height: '70%',
-    }}>
-    <Image
-      source={source}
-      resizeMode="contain"
-      style={{width: '100%', height: '100%'}}
-    />
-  </View>
-);
+// Height was '70%' of a parent whose own height is auto (the library's
+// imageContainer is flex:0), so the percentage had nothing to resolve against
+// and the image claimed far more room than intended — pushing the title and
+// subtitle down until the last line of longer copy ran off the bottom of the
+// screen. Bound it to a fraction of the viewport instead, so the text block
+// always has a predictable amount of space left.
+const ImageComp: React.FC<{source: ImageProps['source']}> = ({source}) => {
+  const {height} = useWindowDimensions();
+  return (
+    <View style={{width: '80%', height: height * 0.32}}>
+      <Image
+        source={source}
+        resizeMode="contain"
+        style={{width: '100%', height: '100%'}}
+      />
+    </View>
+  );
+};
 
 export const OnBoarding: React.FC<OnBoardingProps> = () => {
   const dispatch = useDispatch()
@@ -133,8 +139,14 @@ export const OnBoarding: React.FC<OnBoardingProps> = () => {
     />
   );
 
+  // The library wraps its bottom bar in React Native's own SafeAreaView, which
+  // is a no-op on Android — so Skip/Next were drawn underneath the gesture
+  // navigation bar. Reserve the real inset ourselves.
+  const insets = useSafeAreaInsets();
+  const BOTTOM_BAR_HEIGHT = 60; // the library's default
+
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, paddingBottom: insets.bottom}}>
       <Onboarding
         DotComponent={Square}
         NextButtonComponent={Next}
@@ -142,25 +154,33 @@ export const OnBoarding: React.FC<OnBoardingProps> = () => {
         DoneButtonComponent={Done}
         bottomBarHighlight={false}
         showPagination
-        // containerStyles={{
-        //   borderWidth:2,
-        //   borderColor:'red'
-        // }}
-        // titleStyles={{color: 'blue',borderWidth:1}} // set default color for the title
-
+        // Each page is laid out at the full window height with its content
+        // centred, while the bottom bar is drawn over that same area. Without
+        // this reservation the subtitle rendered underneath the Skip/Next row.
+        containerStyles={{
+          paddingBottom: BOTTOM_BAR_HEIGHT + Metrix.VerticalSize(16),
+          paddingHorizontal: Metrix.HorizontalSize(8),
+        }}
+        // Long translations (Arabic runs longer than English here) need room to
+        // wrap rather than being clipped.
+        subTitleStyles={{lineHeight: Metrix.VerticalSize(22)}}
         pages={[
           {
             backgroundColor: '#DEE9FF',
             image: <ImageComp source={Images.OnBoard1} />,
             title: t('Onboarding_heading1'),
             subtitle: t('Onboarding_text1'),
-            titleStyles: {color: 'red'}, // overwrite default color
+            // Was hardcoded red on page 1 only, leaving the two onboarding
+            // screens visibly inconsistent. Use the theme's primary colour for
+            // both (page 2 inherits the library default via titleStyles below).
+            titleStyles: {color: Utills.selectedThemeColors().Primary},
           },
           {
             backgroundColor: '#DFE',
             image: <ImageComp source={Images.OnBoard2} />,
             title: t('Onboarding_heading2'),
             subtitle: t('Onboarding_text2'),
+            titleStyles: {color: Utills.selectedThemeColors().Primary},
           },
         ]}
       />

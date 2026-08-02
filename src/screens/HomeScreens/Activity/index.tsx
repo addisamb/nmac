@@ -194,39 +194,48 @@ export const Activity: React.FC<ActivityProps> = ({}) => {
     
     dispatch({type: ActionType.HOME_LOADER, payload: true});
     try {
-      const promise1 = getQuizes(courseId);
-      const promise2 = getAssignment(courseId);
-      const promise3 = bonusMaterialData(courseId);
-      const promise4 = ProgressReportData(courseId);
-      const promise5 = fetchMyCourses()
-      const promise6 = SaveName(courseId)
+      // Same rule as CourseDetails: these feed the tabs inside the course and
+      // are supplementary. Requiring all six to be exactly `true` meant one
+      // empty or failing endpoint made the course unopenable from Activity.
+      const results = await Promise.allSettled([
+        getQuizes(courseId),
+        getAssignment(courseId),
+        bonusMaterialData(courseId),
+        ProgressReportData(courseId),
+        fetchMyCourses(),
+        SaveName(courseId),
+      ]);
 
-      await Promise.all([
-        promise1, 
-        promise2, 
-        promise3, 
-        promise4, 
-        promise5,
-        promise6
-      ]).then((res) => {        
-        if (res.every((element) => element === true)) {  
-          dispatch({type: ActionType.HOME_LOADER, payload: false});       
-          NavigationService.navigate(
-            RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
-            {
-              movetoIndex: index,
-              movetoCourseDetail: false,
-            },
-            );
-          } else {
-            dispatch({type: ActionType.HOME_LOADER, payload: false});  
-            // Utills.showToast(t('something_went_wrong_server_error'), '', 'error');
-            Utills.showToast(t('something went wrong server error'), '', 'error');
-          }
-      });
+      dispatch({type: ActionType.HOME_LOADER, payload: false});
+
+      const succeeded = results.filter(
+        r => r.status === 'fulfilled' && r.value,
+      ).length;
+
+      if (succeeded === 0) {
+        // Was t('something went wrong server error') — spaces instead of
+        // underscores, so i18next found no such key and displayed the raw key
+        // back to the user in both languages.
+        Utills.showToast(t('something_went_wrong_server_error'), null, 'error');
+        return;
+      }
+
+      NavigationService.navigate(
+        RouteNames.HomeRoutes.AfterPurchaseCourseDetails,
+        {
+          movetoIndex: index,
+          movetoCourseDetail: false,
+        },
+      );
     } catch (error) {
       dispatch({type: ActionType.HOME_LOADER, payload: false});
-      Utills.showToast(error, '', 'error');
+      Utills.showToast(
+        error instanceof Error
+          ? error.message
+          : t('something_went_wrong_server_error'),
+        null,
+        'error',
+      );
     }
   };
 
@@ -460,7 +469,10 @@ const styles = StyleSheet.create({
     // borderWidth:1,
     borderRadius: Metrix.HorizontalSize(10),
     padding: 10,
-    height: Metrix.VerticalSize(80),
+    // minHeight, not height: a two-line notification plus its timestamp does not
+    // fit in a fixed 80 and was being clipped — more so at larger system font
+    // scales and in Arabic, where the same message runs longer.
+    minHeight: Metrix.VerticalSize(80),
   },
 
   imageStyle: {

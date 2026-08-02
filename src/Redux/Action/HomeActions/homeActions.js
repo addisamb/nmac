@@ -272,6 +272,17 @@ export const submitRatting = data => {
   };
 };
 
+// Fetches the ratings left on a course so the feedback screen can pre-select
+// the score this user already gave. Without it the stars always start empty and
+// there is no way to see — let alone raise — an existing rating.
+export const getCourseRatings = courseId => {
+  return dispatch => {
+    return api(`rating/${courseId}`, null, 'get', dispatch)
+      .then(response => response?.data)
+      .catch(() => false);
+  };
+};
+
 export const onCompleteVideo = body => {
   return dispatch => {
     return api('course-content-history', body, 'post', dispatch)
