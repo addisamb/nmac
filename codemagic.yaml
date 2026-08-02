@@ -21,7 +21,31 @@ workflows:
       cocoapods: default
     scripts:
       - name: Install JS dependencies
-        script: npm install --legacy-peer-deps
+        script: |
+          set -euo pipefail
+          # A bare `npm install` failed here with ECONNRESET partway through the
+          # download. npm's built-in retry policy is short and only covers the
+          # individual request, so one reset connection on a large tarball kills
+          # the whole build. Widen the per-request retry window, then retry the
+          # install itself — transient CI network faults should not cost a run.
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-timeout 600000
+
+          for attempt in 1 2 3; do
+            echo "--- npm install attempt ${attempt}/3 ---"
+            if npm install --legacy-peer-deps --no-audit --no-fund; then
+              echo "dependencies installed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "attempt ${attempt} failed; clearing cache before retry"
+            npm cache clean --force || true
+            sleep 15
+          done
+
+          echo "npm install failed after 3 attempts — likely a genuine registry or network outage"
+          exit 1
 
       - name: Install CocoaPods dependencies (via Bundler — RN pins CocoaPods 1.15.2)
         script: |
@@ -131,7 +155,31 @@ workflows:
       cocoapods: default
     scripts:
       - name: Install JS dependencies
-        script: npm install --legacy-peer-deps
+        script: |
+          set -euo pipefail
+          # A bare `npm install` failed here with ECONNRESET partway through the
+          # download. npm's built-in retry policy is short and only covers the
+          # individual request, so one reset connection on a large tarball kills
+          # the whole build. Widen the per-request retry window, then retry the
+          # install itself — transient CI network faults should not cost a run.
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-timeout 600000
+
+          for attempt in 1 2 3; do
+            echo "--- npm install attempt ${attempt}/3 ---"
+            if npm install --legacy-peer-deps --no-audit --no-fund; then
+              echo "dependencies installed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "attempt ${attempt} failed; clearing cache before retry"
+            npm cache clean --force || true
+            sleep 15
+          done
+
+          echo "npm install failed after 3 attempts — likely a genuine registry or network outage"
+          exit 1
 
       - name: Install CocoaPods (via Bundler, fresh lock)
         script: |
@@ -196,7 +244,31 @@ workflows:
       java: 21                   # matches the Gradle 8.14.3 / JDK 21 toolchain this project builds with
     scripts:
       - name: Install JS dependencies
-        script: npm install --legacy-peer-deps
+        script: |
+          set -euo pipefail
+          # A bare `npm install` failed here with ECONNRESET partway through the
+          # download. npm's built-in retry policy is short and only covers the
+          # individual request, so one reset connection on a large tarball kills
+          # the whole build. Widen the per-request retry window, then retry the
+          # install itself — transient CI network faults should not cost a run.
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-timeout 600000
+
+          for attempt in 1 2 3; do
+            echo "--- npm install attempt ${attempt}/3 ---"
+            if npm install --legacy-peer-deps --no-audit --no-fund; then
+              echo "dependencies installed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "attempt ${attempt} failed; clearing cache before retry"
+            npm cache clean --force || true
+            sleep 15
+          done
+
+          echo "npm install failed after 3 attempts — likely a genuine registry or network outage"
+          exit 1
 
       - name: Build release APK
         script: |
